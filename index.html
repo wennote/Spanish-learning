@@ -79,25 +79,11 @@
         <div class="section-header">
           <div>
             <h2>Practice</h2>
-            <p class="muted">Use flashcards, difficult-word review, and a daily mini quiz with explanations.</p>
+            <p class="muted">Use difficult-word review, a daily mini quiz with explanations, and guided writing from an English sample.</p>
           </div>
-          <button id="next-card" type="button">Next Flashcard</button>
         </div>
 
         <div class="practice-grid">
-          <section class="practice-panel">
-            <h3>Flashcard</h3>
-            <div id="flashcard" class="flashcard">
-              <p class="card-label">Prompt</p>
-              <p id="flashcard-front" class="flashcard-front"></p>
-              <div class="button-row">
-                <button id="show-answer" type="button" class="secondary-button">Show Answer</button>
-                <button id="speak-card" type="button" class="secondary-button">Pronounce</button>
-              </div>
-              <p id="flashcard-back" class="flashcard-back hidden"></p>
-            </div>
-          </section>
-
           <section class="practice-panel">
             <h3>Difficult Word Review</h3>
             <div id="difficult-review" class="result-box muted">Mark words as difficult in Vocabulary. They will appear here for spaced review.</div>
@@ -133,8 +119,8 @@
               <p id="writing-model" class="hidden"></p>
             </div>
             <form id="writing-form" class="feedback-form">
-              <label for="writing-text">Your Spanish paragraph</label>
-              <textarea id="writing-text" rows="8" placeholder="Write the English paragraph above in Spanish."></textarea>
+              <label for="writing-text">Write the English sample in Spanish</label>
+              <textarea id="writing-text" rows="8" placeholder="Read the English sample above, then write it in Spanish here."></textarea>
               <div class="button-row">
                 <button type="submit">Check My Spanish</button>
                 <button id="clear-writing" type="button" class="secondary-button">Clear</button>

@@ -275,30 +275,6 @@ textarea {
   margin-top: 18px;
 }
 
-.flashcard {
-  display: grid;
-  gap: 12px;
-  min-height: 250px;
-  padding: 18px;
-  border-radius: 18px;
-  background:
-    linear-gradient(145deg, rgba(255, 250, 243, 0.96), rgba(243, 231, 213, 0.96));
-  border: 1px solid rgba(179, 63, 40, 0.14);
-}
-
-.card-label {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.76rem;
-  color: var(--accent-dark);
-}
-
-.flashcard-front,
-.flashcard-back {
-  font-size: 1.15rem;
-  color: var(--ink);
-}
-
 .hidden {
   display: none;
 }

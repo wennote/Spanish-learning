@@ -5,11 +5,6 @@ const vocabSearch = document.getElementById("vocab-search");
 const topicFilters = document.getElementById("topic-filters");
 const reviewDifficultButton = document.getElementById("review-difficult");
 const notesList = document.getElementById("notes-list");
-const flashcardFront = document.getElementById("flashcard-front");
-const flashcardBack = document.getElementById("flashcard-back");
-const showAnswerButton = document.getElementById("show-answer");
-const nextCardButton = document.getElementById("next-card");
-const speakCardButton = document.getElementById("speak-card");
 const difficultReview = document.getElementById("difficult-review");
 const quizList = document.getElementById("quiz-list");
 const checkQuizButton = document.getElementById("check-quiz");
@@ -132,15 +127,6 @@ const noteDays = [
   }
 ];
 
-const flashcards = [
-  { front: "Translate: I speak Spanish.", back: "Yo hablo español." },
-  { front: "Translate: We are in Florida.", back: "Nosotros estamos en Florida." },
-  { front: "Which verb means 'to want'?", back: "querer" },
-  { front: "How do you ask: How are you today?", back: "¿Cómo estás hoy?" },
-  { front: "Translate: Today I am calm.", back: "Hoy estoy tranquilo." },
-  { front: "How do you say: Where are you going today?", back: "¿Dónde vas hoy?" }
-];
-
 const quizQuestions = [
   {
     prompt: "Which form is correct for 'we live'?",
@@ -229,7 +215,6 @@ const translationMap = [
   { pattern: /\bhow are you today\??\b/gi, replacement: "¿Cómo estás hoy?" }
 ];
 
-let currentFlashcard = 0;
 let activeTopic = "all";
 let currentWritingPrompt = 0;
 
@@ -348,13 +333,6 @@ function renderNotes() {
       <ul class="note-list">${day.examples.map((example) => `<li>${example}</li>`).join("")}</ul>
     </article>
   `).join("");
-}
-
-function showFlashcard(index) {
-  const card = flashcards[index];
-  flashcardFront.textContent = card.front;
-  flashcardBack.textContent = card.back;
-  flashcardBack.classList.add("hidden");
 }
 
 function renderQuiz() {
@@ -568,19 +546,6 @@ tabs.forEach((tab) => {
 vocabSearch.addEventListener("input", () => applyVocabularyFilters());
 reviewDifficultButton.addEventListener("click", reviewDifficultWords);
 
-showAnswerButton.addEventListener("click", () => {
-  flashcardBack.classList.remove("hidden");
-});
-
-nextCardButton.addEventListener("click", () => {
-  currentFlashcard = (currentFlashcard + 1) % flashcards.length;
-  showFlashcard(currentFlashcard);
-});
-
-speakCardButton.addEventListener("click", () => {
-  speakText(flashcardBack.classList.contains("hidden") ? flashcardFront.textContent : flashcardBack.textContent);
-});
-
 checkQuizButton.addEventListener("click", checkQuiz);
 resetQuizButton.addEventListener("click", resetQuiz);
 
@@ -647,7 +612,6 @@ renderTopicFilters();
 applyVocabularyFilters();
 renderNotes();
 renderQuiz();
-showFlashcard(currentFlashcard);
 renderDifficultReview();
 renderQuizHistory();
 loadFeedback();
