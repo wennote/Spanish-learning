@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanish Learning</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Spanish-learning</p>
+      <h1>Spanish Learning</h1>
+      <p class="hero-copy">A focused study site built from your first four days of Spanish notes, with vocabulary review, daily lesson summaries, and short practice drills.</p>
+    </section>
+
+    <nav class="tab-bar" aria-label="Main tabs">
+      <button class="tab-button active" type="button" data-tab="readme">Read Me</button>
+      <button class="tab-button" type="button" data-tab="vocabulary">Vocabulary</button>
+      <button class="tab-button" type="button" data-tab="notes">Daily Notes</button>
+      <button class="tab-button" type="button" data-tab="practice">Practice</button>
+      <button class="tab-button" type="button" data-tab="feedback">Feedback</button>
+    </nav>
+
+    <section id="readme" class="tab-panel active">
+      <article class="card">
+        <h2>Read Me</h2>
+        <p>This website is a personal Spanish study dashboard based on your first four days of notes. It is designed to keep the early learning material in one place so you can review verbs, vocabulary, sentence patterns, and question forms without searching across separate files. The Vocabulary tab groups useful words and model phrases from the lessons. The Daily Notes tab keeps each day’s learning points organized, including regular verbs, <em>ser</em> and <em>estar</em>, key verbs such as <em>ir</em>, <em>tener</em>, <em>hacer</em>, and <em>querer</em>, and basic question patterns. The Practice tab gives quick drills and flashcard-style review to help you repeat forms aloud. The Feedback tab lets you write comments locally in the browser so you can keep track of what is clear, what is confusing, and what should be improved in later versions.</p>
+        <div class="info-grid">
+          <div class="info-panel">
+            <h3>Current Sections</h3>
+            <ul>
+              <li><strong>Vocabulary</strong>: words, verbs, and short example phrases from Days 1 to 4.</li>
+              <li><strong>Daily Notes</strong>: lesson-by-lesson summaries from your study files.</li>
+              <li><strong>Practice</strong>: flashcards, fill-in review, and simple self-check questions.</li>
+              <li><strong>Feedback</strong>: local notes about problems, ideas, and learning progress.</li>
+            </ul>
+          </div>
+          <div class="info-panel">
+            <h3>Suggested Next Functions</h3>
+            <ul>
+              <li>Pronunciation audio for key words and sentences.</li>
+              <li>Spaced-review mode for words marked as difficult.</li>
+              <li>Daily mini quiz score tracking.</li>
+              <li>A writing practice tab for short self-introductions and daily routine paragraphs.</li>
+              <li>Topic filters such as verbs, feelings, places, and questions.</li>
+            </ul>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="vocabulary" class="tab-panel">
+      <article class="card">
+        <div class="section-header">
+          <div>
+            <h2>Vocabulary</h2>
+            <p class="muted">Core words and example phrases pulled from the first four study days.</p>
+          </div>
+          <input id="vocab-search" class="search-input" type="text" placeholder="Search word, meaning, or example">
+        </div>
+        <div id="vocab-list" class="vocab-grid"></div>
+      </article>
+    </section>
+
+    <section id="notes" class="tab-panel">
+      <article class="card">
+        <h2>Daily Notes</h2>
+        <div id="notes-list" class="notes-list"></div>
+      </article>
+    </section>
+
+    <section id="practice" class="tab-panel">
+      <article class="card">
+        <div class="section-header">
+          <div>
+            <h2>Practice</h2>
+            <p class="muted">Use short self-check exercises and random review prompts.</p>
+          </div>
+          <button id="next-card" type="button">Next Flashcard</button>
+        </div>
+
+        <div class="practice-grid">
+          <section class="practice-panel">
+            <h3>Flashcard</h3>
+            <div id="flashcard" class="flashcard">
+              <p class="card-label">Prompt</p>
+              <p id="flashcard-front" class="flashcard-front"></p>
+              <button id="show-answer" type="button" class="secondary-button">Show Answer</button>
+              <p id="flashcard-back" class="flashcard-back hidden"></p>
+            </div>
+          </section>
+
+          <section class="practice-panel">
+            <h3>Quick Review</h3>
+            <div id="quiz-list" class="quiz-list"></div>
+            <button id="check-quiz" type="button">Check Answers</button>
+            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score.</div>
+          </section>
+        </div>
+      </article>
+    </section>
+
+    <section id="feedback" class="tab-panel">
+      <article class="card">
+        <h2>Feedback</h2>
+        <p class="muted">Write comments about your learning progress, errors you notice, or new features you want. Feedback is stored locally in this browser.</p>
+        <form id="feedback-form" class="feedback-form">
+          <label for="feedback-text">Your comments</label>
+          <textarea id="feedback-text" rows="8" placeholder="Example: Day 2 ser vs estar needs more practice examples."></textarea>
+          <div class="button-row">
+            <button type="submit">Save Comments</button>
+            <button id="clear-feedback" type="button" class="secondary-button">Clear</button>
+          </div>
+        </form>
+        <div id="feedback-status" class="result-box muted">No saved feedback yet.</div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
