@@ -2,49 +2,70 @@ const tabs = document.querySelectorAll(".tab-button");
 const panels = document.querySelectorAll(".tab-panel");
 const vocabList = document.getElementById("vocab-list");
 const vocabSearch = document.getElementById("vocab-search");
+const topicFilters = document.getElementById("topic-filters");
+const reviewDifficultButton = document.getElementById("review-difficult");
 const notesList = document.getElementById("notes-list");
 const flashcardFront = document.getElementById("flashcard-front");
 const flashcardBack = document.getElementById("flashcard-back");
 const showAnswerButton = document.getElementById("show-answer");
 const nextCardButton = document.getElementById("next-card");
+const speakCardButton = document.getElementById("speak-card");
+const difficultReview = document.getElementById("difficult-review");
 const quizList = document.getElementById("quiz-list");
 const checkQuizButton = document.getElementById("check-quiz");
+const resetQuizButton = document.getElementById("reset-quiz");
 const quizResult = document.getElementById("quiz-result");
+const quizHistory = document.getElementById("quiz-history");
+const writingForm = document.getElementById("writing-form");
+const writingText = document.getElementById("writing-text");
+const writingFeedback = document.getElementById("writing-feedback");
+const clearWritingButton = document.getElementById("clear-writing");
 const feedbackForm = document.getElementById("feedback-form");
 const feedbackText = document.getElementById("feedback-text");
 const feedbackStatus = document.getElementById("feedback-status");
 const clearFeedbackButton = document.getElementById("clear-feedback");
+const translateForm = document.getElementById("translate-form");
+const translateInput = document.getElementById("translate-input");
+const translateOutput = document.getElementById("translate-output");
+const speakTranslationButton = document.getElementById("speak-translation");
+
+const storageKeys = {
+  difficult: "spanish-learning-difficult",
+  feedback: "spanish-learning-feedback",
+  writing: "spanish-learning-writing",
+  quizHistory: "spanish-learning-quiz-history"
+};
 
 const vocabulary = [
-  { spanish: "hablar", english: "to speak", day: "Day 1", example: "Yo hablo español." },
-  { spanish: "comer", english: "to eat", day: "Day 1", example: "Ellos comen pizza." },
-  { spanish: "vivir", english: "to live", day: "Day 1", example: "Yo vivo en Florida." },
-  { spanish: "estudiar", english: "to study", day: "Day 1", example: "Nosotros estudiamos español." },
-  { spanish: "trabajar", english: "to work", day: "Day 1", example: "Yo trabajo en casa." },
-  { spanish: "cocinar", english: "to cook", day: "Day 1", example: "Yo cocino en casa." },
-  { spanish: "limpiar", english: "to clean", day: "Day 1", example: "Ella limpia." },
-  { spanish: "la casa", english: "the house", day: "Day 1", example: "Yo vivo en casa." },
-  { spanish: "la escuela", english: "the school", day: "Day 1", example: "Nosotros estudiamos en la escuela." },
-  { spanish: "la comida", english: "food / meal", day: "Day 1", example: "Ellos comen la comida." },
-  { spanish: "ser", english: "to be", day: "Day 2", example: "Yo soy de Florida." },
-  { spanish: "estar", english: "to be", day: "Day 2", example: "Yo estoy en casa." },
-  { spanish: "estudiante", english: "student", day: "Day 2", example: "Yo soy un estudiante de español." },
-  { spanish: "hoy", english: "today", day: "Day 2", example: "Hoy estoy cansado." },
-  { spanish: "cansado", english: "tired", day: "Day 2", example: "Hoy estoy cansado." },
-  { spanish: "ocupado", english: "busy", day: "Day 2", example: "Hoy estoy ocupado." },
-  { spanish: "contento", english: "happy", day: "Day 2", example: "Hoy estoy contento." },
-  { spanish: "ir", english: "to go", day: "Day 3", example: "Yo voy a casa." },
-  { spanish: "tener", english: "to have", day: "Day 3", example: "Yo tengo trabajo." },
-  { spanish: "hacer", english: "to do / to make", day: "Day 3", example: "Yo hago la comida en casa." },
-  { spanish: "querer", english: "to want", day: "Day 3", example: "Yo quiero pizza." },
-  { spanish: "tranquilo", english: "calm", day: "Day 3", example: "Hoy estoy tranquilo." },
-  { spanish: "nervioso", english: "nervous", day: "Day 3", example: "Hoy estoy nervioso." },
-  { spanish: "orgulloso", english: "proud", day: "Day 3", example: "Hoy estoy orgulloso." },
-  { spanish: "¿Qué?", english: "What?", day: "Day 4", example: "¿Qué quieres comer hoy?" },
-  { spanish: "¿Dónde?", english: "Where?", day: "Day 4", example: "¿Dónde vas hoy?" },
-  { spanish: "¿Cuándo?", english: "When?", day: "Day 4", example: "¿Cuándo vas a la escuela?" },
-  { spanish: "¿Cómo?", english: "How?", day: "Day 4", example: "¿Cómo estás hoy?" },
-  { spanish: "¿Quién?", english: "Who?", day: "Day 4", example: "¿Quién?" }
+  { id: "hablar", spanish: "hablar", english: "to speak", day: "Day 1", topic: "verbs", example: "Yo hablo español." },
+  { id: "comer", spanish: "comer", english: "to eat", day: "Day 1", topic: "verbs", example: "Ellos comen pizza." },
+  { id: "vivir", spanish: "vivir", english: "to live", day: "Day 1", topic: "verbs", example: "Yo vivo en Florida." },
+  { id: "estudiar", spanish: "estudiar", english: "to study", day: "Day 1", topic: "verbs", example: "Nosotros estudiamos español." },
+  { id: "trabajar", spanish: "trabajar", english: "to work", day: "Day 1", topic: "verbs", example: "Yo trabajo en casa." },
+  { id: "cocinar", spanish: "cocinar", english: "to cook", day: "Day 1", topic: "verbs", example: "Yo cocino en casa." },
+  { id: "limpiar", spanish: "limpiar", english: "to clean", day: "Day 1", topic: "verbs", example: "Ella limpia." },
+  { id: "casa", spanish: "la casa", english: "the house", day: "Day 1", topic: "places", example: "Yo vivo en casa." },
+  { id: "escuela", spanish: "la escuela", english: "the school", day: "Day 1", topic: "places", example: "Nosotros estudiamos en la escuela." },
+  { id: "comida", spanish: "la comida", english: "food / meal", day: "Day 1", topic: "places", example: "Ellos comen la comida." },
+  { id: "ser", spanish: "ser", english: "to be", day: "Day 2", topic: "verbs", example: "Yo soy de Florida." },
+  { id: "estar", spanish: "estar", english: "to be", day: "Day 2", topic: "verbs", example: "Yo estoy en casa." },
+  { id: "estudiante", spanish: "estudiante", english: "student", day: "Day 2", topic: "places", example: "Yo soy un estudiante de español." },
+  { id: "hoy", spanish: "hoy", english: "today", day: "Day 2", topic: "questions", example: "Hoy estoy cansado." },
+  { id: "cansado", spanish: "cansado", english: "tired", day: "Day 2", topic: "feelings", example: "Hoy estoy cansado." },
+  { id: "ocupado", spanish: "ocupado", english: "busy", day: "Day 2", topic: "feelings", example: "Hoy estoy ocupado." },
+  { id: "contento", spanish: "contento", english: "happy", day: "Day 2", topic: "feelings", example: "Hoy estoy contento." },
+  { id: "ir", spanish: "ir", english: "to go", day: "Day 3", topic: "verbs", example: "Yo voy a casa." },
+  { id: "tener", spanish: "tener", english: "to have", day: "Day 3", topic: "verbs", example: "Yo tengo trabajo." },
+  { id: "hacer", spanish: "hacer", english: "to do / to make", day: "Day 3", topic: "verbs", example: "Yo hago la comida en casa." },
+  { id: "querer", spanish: "querer", english: "to want", day: "Day 3", topic: "verbs", example: "Yo quiero pizza." },
+  { id: "tranquilo", spanish: "tranquilo", english: "calm", day: "Day 3", topic: "feelings", example: "Hoy estoy tranquilo." },
+  { id: "nervioso", spanish: "nervioso", english: "nervous", day: "Day 3", topic: "feelings", example: "Hoy estoy nervioso." },
+  { id: "orgulloso", spanish: "orgulloso", english: "proud", day: "Day 3", topic: "feelings", example: "Hoy estoy orgulloso." },
+  { id: "que", spanish: "¿Qué?", english: "What?", day: "Day 4", topic: "questions", example: "¿Qué quieres comer hoy?" },
+  { id: "donde", spanish: "¿Dónde?", english: "Where?", day: "Day 4", topic: "questions", example: "¿Dónde vas hoy?" },
+  { id: "cuando", spanish: "¿Cuándo?", english: "When?", day: "Day 4", topic: "questions", example: "¿Cuándo vas a la escuela?" },
+  { id: "como", spanish: "¿Cómo?", english: "How?", day: "Day 4", topic: "questions", example: "¿Cómo estás hoy?" },
+  { id: "quien", spanish: "¿Quién?", english: "Who?", day: "Day 4", topic: "questions", example: "¿Quién?" }
 ];
 
 const noteDays = [
@@ -119,40 +140,153 @@ const quizQuestions = [
   {
     prompt: "Which form is correct for 'we live'?",
     options: ["nosotros vive", "nosotros vivimos", "nosotros viven"],
-    answer: "nosotros vivimos"
+    answer: "nosotros vivimos",
+    explanation: "Use the nosotros ending for regular -ir verbs: vivir -> vivimos."
   },
   {
     prompt: "Choose the correct sentence for location.",
     options: ["Nosotros somos en Florida.", "Nosotros estamos en Florida.", "Nosotros es en Florida."],
-    answer: "Nosotros estamos en Florida."
+    answer: "Nosotros estamos en Florida.",
+    explanation: "Use estar for location. Ser is not used for where a person is."
   },
   {
     prompt: "Which verb means 'to have'?",
     options: ["tener", "hacer", "querer"],
-    answer: "tener"
+    answer: "tener",
+    explanation: "Tener means 'to have'. Hacer means 'to do/make', and querer means 'to want'."
   },
   {
     prompt: "What does '¿Qué?' mean?",
     options: ["When?", "What?", "Who?"],
-    answer: "What?"
+    answer: "What?",
+    explanation: "¿Qué? is the basic question word for 'What?'."
   }
 ];
 
+const translationMap = [
+  { pattern: /\bi am from florida\b/gi, replacement: "Yo soy de Florida" },
+  { pattern: /\bi am at home\b/gi, replacement: "Yo estoy en casa" },
+  { pattern: /\btoday i am at home\b/gi, replacement: "Hoy estoy en casa" },
+  { pattern: /\btoday i am tired\b/gi, replacement: "Hoy estoy cansado" },
+  { pattern: /\btoday i am busy\b/gi, replacement: "Hoy estoy ocupado" },
+  { pattern: /\btoday i am calm\b/gi, replacement: "Hoy estoy tranquilo" },
+  { pattern: /\bi study spanish\b/gi, replacement: "Yo estudio español" },
+  { pattern: /\bwe study spanish\b/gi, replacement: "Nosotros estudiamos español" },
+  { pattern: /\bi work at home\b/gi, replacement: "Yo trabajo en casa" },
+  { pattern: /\bi work in the house\b/gi, replacement: "Yo trabajo en casa" },
+  { pattern: /\bi want pizza\b/gi, replacement: "Yo quiero pizza" },
+  { pattern: /\bi want to study spanish\b/gi, replacement: "Yo quiero estudiar español" },
+  { pattern: /\bi go to school\b/gi, replacement: "Yo voy a la escuela" },
+  { pattern: /\bwhere are you going today\??\b/gi, replacement: "¿Dónde vas hoy?" },
+  { pattern: /\bhow are you today\??\b/gi, replacement: "¿Cómo estás hoy?" }
+];
+
 let currentFlashcard = 0;
+let activeTopic = "all";
+
+function getStoredArray(key) {
+  try {
+    return JSON.parse(window.localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function setStoredArray(key, value) {
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
 
 function activateTab(tabName) {
   tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
   panels.forEach((panel) => panel.classList.toggle("active", panel.id === tabName));
 }
 
-function renderVocabulary(items) {
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "es-ES";
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+function renderTopicFilters() {
+  const topics = ["all", ...new Set(vocabulary.map((item) => item.topic))];
+  topicFilters.innerHTML = topics.map((topic) => `
+    <button
+      type="button"
+      class="filter-chip ${topic === activeTopic ? "active-chip" : ""}"
+      data-topic="${topic}"
+    >${topic}</button>
+  `).join("");
+
+  topicFilters.querySelectorAll(".filter-chip").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeTopic = button.dataset.topic;
+      renderTopicFilters();
+      applyVocabularyFilters();
+    });
+  });
+}
+
+function toggleDifficultWord(id) {
+  const difficult = getStoredArray(storageKeys.difficult);
+  const next = difficult.includes(id)
+    ? difficult.filter((item) => item !== id)
+    : [...difficult, id];
+  setStoredArray(storageKeys.difficult, next);
+  applyVocabularyFilters();
+  renderDifficultReview();
+}
+
+function applyVocabularyFilters(showOnlyDifficult = false) {
+  const term = vocabSearch.value.trim().toLowerCase();
+  const difficult = getStoredArray(storageKeys.difficult);
+  const items = vocabulary.filter((item) => {
+    const matchesSearch = [item.spanish, item.english, item.day, item.example, item.topic]
+      .some((value) => value.toLowerCase().includes(term));
+    const matchesTopic = activeTopic === "all" || item.topic === activeTopic;
+    const matchesDifficult = !showOnlyDifficult || difficult.includes(item.id);
+    return matchesSearch && matchesTopic && matchesDifficult;
+  });
+  renderVocabulary(items, difficult, showOnlyDifficult);
+}
+
+function renderVocabulary(items, difficultWords, difficultMode) {
+  if (items.length === 0) {
+    vocabList.innerHTML = `<div class="result-box muted">${difficultMode ? "No difficult words match the current filter." : "No vocabulary matches the current search or topic filter."}</div>`;
+    return;
+  }
+
   vocabList.innerHTML = items.map((item) => `
     <article class="vocab-card">
-      <h3>${item.spanish}</h3>
-      <p class="vocab-meta">${item.english} • ${item.day}</p>
+      <div class="vocab-header">
+        <div>
+          <h3>${item.spanish}</h3>
+          <p class="vocab-meta">${item.english} • ${item.day} • ${item.topic}</p>
+        </div>
+        <button type="button" class="mini-button pronounce-word" data-text="${item.spanish}">Audio</button>
+      </div>
       <p>${item.example}</p>
+      <div class="button-row">
+        <button
+          type="button"
+          class="secondary-button mark-difficult"
+          data-id="${item.id}"
+        >${difficultWords.includes(item.id) ? "Marked Difficult" : "Mark Difficult"}</button>
+        <button type="button" class="secondary-button pronounce-word" data-text="${item.example}">Phrase Audio</button>
+      </div>
     </article>
   `).join("");
+
+  document.querySelectorAll(".mark-difficult").forEach((button) => {
+    button.addEventListener("click", () => toggleDifficultWord(button.dataset.id));
+  });
+
+  document.querySelectorAll(".pronounce-word").forEach((button) => {
+    button.addEventListener("click", () => speakText(button.dataset.text));
+  });
 }
 
 function renderNotes() {
@@ -190,23 +324,146 @@ function renderQuiz() {
   `).join("");
 }
 
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function renderQuizHistory() {
+  const history = JSON.parse(window.localStorage.getItem(storageKeys.quizHistory) || "{}");
+  const today = history[todayKey()];
+  if (!today) {
+    quizHistory.textContent = "No quiz score saved for today.";
+    return;
+  }
+  quizHistory.textContent = `Today's saved score: ${today.score}/${today.total}. Saved on ${today.date}.`;
+}
+
 function checkQuiz() {
   let score = 0;
+  const explanations = [];
+
   quizQuestions.forEach((question, index) => {
     const selected = document.querySelector(`input[name="quiz-${index}"]:checked`);
     if (selected && selected.value === question.answer) {
       score += 1;
+    } else {
+      explanations.push(`<li><strong>Question ${index + 1}:</strong> Correct answer: ${question.answer}. ${question.explanation}</li>`);
     }
   });
-  quizResult.textContent = `You scored ${score} out of ${quizQuestions.length}. Repeat the incorrect ones aloud once more.`;
+
+  const history = JSON.parse(window.localStorage.getItem(storageKeys.quizHistory) || "{}");
+  history[todayKey()] = { score, total: quizQuestions.length, date: new Date().toLocaleString() };
+  window.localStorage.setItem(storageKeys.quizHistory, JSON.stringify(history));
+
+  quizResult.innerHTML = `
+    <p><strong>Score:</strong> ${score} out of ${quizQuestions.length}</p>
+    ${explanations.length ? `<p><strong>Why the wrong answers were wrong</strong></p><ul>${explanations.join("")}</ul>` : "<p>Perfect score. All answers are correct.</p>"}
+  `;
   quizResult.classList.remove("muted");
+  renderQuizHistory();
+}
+
+function resetQuiz() {
+  document.querySelectorAll('#quiz-list input[type="radio"]').forEach((input) => {
+    input.checked = false;
+  });
+  quizResult.textContent = "Quiz reset. Choose an answer for each question, then check your score.";
+  quizResult.classList.add("muted");
+}
+
+function renderDifficultReview() {
+  const difficultIds = getStoredArray(storageKeys.difficult);
+  const items = vocabulary.filter((item) => difficultIds.includes(item.id));
+  if (!items.length) {
+    difficultReview.textContent = "Mark words as difficult in Vocabulary. They will appear here for spaced review.";
+    return;
+  }
+
+  difficultReview.innerHTML = `
+    <p><strong>Review these words aloud:</strong></p>
+    <ul>${items.map((item) => `<li>${item.spanish} - ${item.english}</li>`).join("")}</ul>
+  `;
+}
+
+function reviewDifficultWords() {
+  activeTopic = "all";
+  renderTopicFilters();
+  activateTab("vocabulary");
+  applyVocabularyFilters(true);
+}
+
+function evaluateWriting(text) {
+  const feedback = [];
+  const lower = text.toLowerCase();
+
+  if (!text.trim()) {
+    return "Please write a short paragraph first.";
+  }
+  if (!/\b(soy|estoy|estudio|trabajo|quiero|voy|tengo|hago)\b/i.test(text)) {
+    feedback.push("Try using at least one core verb such as soy, estoy, estudio, trabajo, quiero, voy, tengo, or hago.");
+  }
+  if (!/[.?!]/.test(text)) {
+    feedback.push("Add punctuation so your paragraph reads like complete sentences.");
+  }
+  if (lower.includes("yo yo")) {
+    feedback.push("Avoid repeating 'yo' too often. Spanish often sounds better with fewer repeated pronouns.");
+  }
+  if (lower.includes("somos en") || lower.includes("soy en")) {
+    feedback.push("For location, use estar instead of ser.");
+  }
+  if (!/\b(hoy|florida|casa|escuela|español)\b/i.test(text)) {
+    feedback.push("Add one real detail such as hoy, casa, escuela, Florida, or español.");
+  }
+
+  if (!feedback.length) {
+    return "Good start. Your paragraph uses recognizable beginner Spanish patterns from the lessons.";
+  }
+  return feedback.join(" ");
+}
+
+function translateParagraph(text) {
+  if (!text.trim()) {
+    return "Please enter an English paragraph first.";
+  }
+
+  const segments = text
+    .split(/[.!?]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  const translated = segments.map((segment) => {
+    let current = segment.toLowerCase();
+    translationMap.forEach((rule) => {
+      current = current.replace(rule.pattern, rule.replacement);
+    });
+    current = current
+      .replace(/\bi\b/g, "yo")
+      .replace(/\bwe\b/g, "nosotros")
+      .replace(/\bam\b/g, "soy")
+      .replace(/\bare\b/g, "están")
+      .replace(/\bat home\b/g, "en casa")
+      .replace(/\bspanish\b/g, "español");
+
+    current = current.charAt(0).toUpperCase() + current.slice(1);
+    return current.endsWith("?") ? current : `${current}.`;
+  });
+
+  return translated.join(" ");
 }
 
 function loadFeedback() {
-  const saved = window.localStorage.getItem("spanish-learning-feedback");
+  const saved = window.localStorage.getItem(storageKeys.feedback);
   if (saved) {
     feedbackText.value = saved;
     feedbackStatus.textContent = "Saved feedback loaded from this browser.";
+  }
+}
+
+function loadWriting() {
+  const saved = window.localStorage.getItem(storageKeys.writing);
+  if (saved) {
+    writingText.value = saved;
+    writingFeedback.textContent = evaluateWriting(saved);
   }
 }
 
@@ -214,13 +471,8 @@ tabs.forEach((tab) => {
   tab.addEventListener("click", () => activateTab(tab.dataset.tab));
 });
 
-vocabSearch.addEventListener("input", (event) => {
-  const term = event.target.value.trim().toLowerCase();
-  const filtered = vocabulary.filter((item) =>
-    [item.spanish, item.english, item.day, item.example].some((value) => value.toLowerCase().includes(term))
-  );
-  renderVocabulary(filtered);
-});
+vocabSearch.addEventListener("input", () => applyVocabularyFilters());
+reviewDifficultButton.addEventListener("click", reviewDifficultWords);
 
 showAnswerButton.addEventListener("click", () => {
   flashcardBack.classList.remove("hidden");
@@ -231,7 +483,25 @@ nextCardButton.addEventListener("click", () => {
   showFlashcard(currentFlashcard);
 });
 
+speakCardButton.addEventListener("click", () => {
+  speakText(flashcardBack.classList.contains("hidden") ? flashcardFront.textContent : flashcardBack.textContent);
+});
+
 checkQuizButton.addEventListener("click", checkQuiz);
+resetQuizButton.addEventListener("click", resetQuiz);
+
+writingForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const value = writingText.value.trim();
+  window.localStorage.setItem(storageKeys.writing, value);
+  writingFeedback.textContent = evaluateWriting(value);
+});
+
+clearWritingButton.addEventListener("click", () => {
+  window.localStorage.removeItem(storageKeys.writing);
+  writingText.value = "";
+  writingFeedback.textContent = "Saved writing cleared.";
+});
 
 feedbackForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -240,18 +510,34 @@ feedbackForm.addEventListener("submit", (event) => {
     feedbackStatus.textContent = "Please write a comment before saving.";
     return;
   }
-  window.localStorage.setItem("spanish-learning-feedback", value);
+  window.localStorage.setItem(storageKeys.feedback, value);
   feedbackStatus.textContent = "Feedback saved locally in this browser.";
 });
 
 clearFeedbackButton.addEventListener("click", () => {
-  window.localStorage.removeItem("spanish-learning-feedback");
+  window.localStorage.removeItem(storageKeys.feedback);
   feedbackText.value = "";
   feedbackStatus.textContent = "Saved feedback cleared.";
 });
 
-renderVocabulary(vocabulary);
+translateForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  translateOutput.textContent = translateParagraph(translateInput.value);
+  translateOutput.classList.remove("muted");
+});
+
+speakTranslationButton.addEventListener("click", () => {
+  if (translateOutput.textContent && !translateOutput.classList.contains("muted")) {
+    speakText(translateOutput.textContent);
+  }
+});
+
+renderTopicFilters();
+applyVocabularyFilters();
 renderNotes();
 renderQuiz();
 showFlashcard(currentFlashcard);
+renderDifficultReview();
+renderQuizHistory();
 loadFeedback();
+loadWriting();
