@@ -20,6 +20,10 @@ const writingForm = document.getElementById("writing-form");
 const writingText = document.getElementById("writing-text");
 const writingFeedback = document.getElementById("writing-feedback");
 const clearWritingButton = document.getElementById("clear-writing");
+const writingPromptText = document.getElementById("writing-prompt-text");
+const nextWritingPromptButton = document.getElementById("next-writing-prompt");
+const showWritingModelButton = document.getElementById("show-writing-model");
+const writingModel = document.getElementById("writing-model");
 const feedbackForm = document.getElementById("feedback-form");
 const feedbackText = document.getElementById("feedback-text");
 const feedbackStatus = document.getElementById("feedback-status");
@@ -33,7 +37,8 @@ const storageKeys = {
   difficult: "spanish-learning-difficult",
   feedback: "spanish-learning-feedback",
   writing: "spanish-learning-writing",
-  quizHistory: "spanish-learning-quiz-history"
+  quizHistory: "spanish-learning-quiz-history",
+  writingPromptIndex: "spanish-learning-writing-prompt-index"
 };
 
 const vocabulary = [
@@ -163,6 +168,49 @@ const quizQuestions = [
   }
 ];
 
+const writingPrompts = [
+  {
+    english: "I am from Florida. Today I am at home. I study Spanish and I work at home.",
+    spanish: "Yo soy de Florida. Hoy estoy en casa. Yo estudio español y trabajo en casa.",
+    checks: [
+      { test: (text) => /\bsoy\b/i.test(text), message: "Use 'soy' for identity or origin: 'I am from Florida' -> 'Yo soy de Florida.'" },
+      { test: (text) => /\bestoy en casa\b/i.test(text), message: "Use 'estoy en casa' for location. In Spanish, location uses estar, not ser." },
+      { test: (text) => /\bestudio español\b/i.test(text), message: "Include 'Yo estudio español' to show the action 'I study Spanish'." },
+      { test: (text) => /\btrabajo en casa\b/i.test(text), message: "Use 'trabajo en casa' for 'I work at home'." }
+    ]
+  },
+  {
+    english: "Today I am tired but calm. I want pizza. I make food at home.",
+    spanish: "Hoy estoy cansado pero tranquilo. Yo quiero pizza. Yo hago la comida en casa.",
+    checks: [
+      { test: (text) => /\bestoy cansado\b/i.test(text), message: "Use 'estoy cansado' for 'I am tired'. Feelings usually use estar." },
+      { test: (text) => /\btranquilo\b/i.test(text), message: "Include 'tranquilo' for 'calm'." },
+      { test: (text) => /\bquiero pizza\b/i.test(text), message: "Use 'quiero pizza' for 'I want pizza'." },
+      { test: (text) => /\bhago la comida en casa\b/i.test(text), message: "Use 'hago la comida en casa' for 'I make food at home'." }
+    ]
+  },
+  {
+    english: "We study Spanish at school. We live in Florida. Today we are busy.",
+    spanish: "Nosotros estudiamos español en la escuela. Nosotros vivimos en Florida. Hoy estamos ocupados.",
+    checks: [
+      { test: (text) => /\bnosotros estudiamos español\b/i.test(text), message: "Use the nosotros form 'estudiamos' for 'we study'." },
+      { test: (text) => /\ben la escuela\b/i.test(text), message: "Include 'en la escuela' for 'at school'." },
+      { test: (text) => /\bnosotros vivimos en florida\b/i.test(text), message: "Use 'vivimos' for 'we live'." },
+      { test: (text) => /\bestamos ocupad/i.test(text), message: "Use estar for temporary condition: 'we are busy' -> 'estamos ocupados/ocupadas'." }
+    ]
+  },
+  {
+    english: "Where are you going today? I go to school. What do you want to eat today? I want pizza.",
+    spanish: "¿Dónde vas hoy? Yo voy a la escuela. ¿Qué quieres comer hoy? Yo quiero pizza.",
+    checks: [
+      { test: (text) => /¿dónde vas hoy\?/i.test(text) || /dónde vas hoy/i.test(text), message: "The first sentence should ask '¿Dónde vas hoy?'." },
+      { test: (text) => /\bvoy a la escuela\b/i.test(text), message: "Use 'voy a la escuela' for 'I go to school'." },
+      { test: (text) => /¿qué quieres comer hoy\?/i.test(text) || /qué quieres comer hoy/i.test(text), message: "The second question should be '¿Qué quieres comer hoy?'." },
+      { test: (text) => /\bquiero pizza\b/i.test(text), message: "Use 'quiero pizza' for 'I want pizza'." }
+    ]
+  }
+];
+
 const translationMap = [
   { pattern: /\bi am from florida\b/gi, replacement: "Yo soy de Florida" },
   { pattern: /\bi am at home\b/gi, replacement: "Yo estoy en casa" },
@@ -183,6 +231,7 @@ const translationMap = [
 
 let currentFlashcard = 0;
 let activeTopic = "all";
+let currentWritingPrompt = 0;
 
 function getStoredArray(key) {
   try {
@@ -392,33 +441,71 @@ function reviewDifficultWords() {
   applyVocabularyFilters(true);
 }
 
+function normalizeSpanish(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[¿?!.;,]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function renderWritingPrompt() {
+  const prompt = writingPrompts[currentWritingPrompt];
+  writingPromptText.textContent = prompt.english;
+  writingModel.textContent = prompt.spanish;
+  writingModel.classList.add("hidden");
+}
+
 function evaluateWriting(text) {
-  const feedback = [];
-  const lower = text.toLowerCase();
-
   if (!text.trim()) {
-    return "Please write a short paragraph first.";
-  }
-  if (!/\b(soy|estoy|estudio|trabajo|quiero|voy|tengo|hago)\b/i.test(text)) {
-    feedback.push("Try using at least one core verb such as soy, estoy, estudio, trabajo, quiero, voy, tengo, or hago.");
-  }
-  if (!/[.?!]/.test(text)) {
-    feedback.push("Add punctuation so your paragraph reads like complete sentences.");
-  }
-  if (lower.includes("yo yo")) {
-    feedback.push("Avoid repeating 'yo' too often. Spanish often sounds better with fewer repeated pronouns.");
-  }
-  if (lower.includes("somos en") || lower.includes("soy en")) {
-    feedback.push("For location, use estar instead of ser.");
-  }
-  if (!/\b(hoy|florida|casa|escuela|español)\b/i.test(text)) {
-    feedback.push("Add one real detail such as hoy, casa, escuela, Florida, or español.");
+    return {
+      ok: false,
+      html: "<p>Please write the paragraph in Spanish first.</p>"
+    };
   }
 
-  if (!feedback.length) {
-    return "Good start. Your paragraph uses recognizable beginner Spanish patterns from the lessons.";
+  const prompt = writingPrompts[currentWritingPrompt];
+  const normalized = normalizeSpanish(text);
+  const model = normalizeSpanish(prompt.spanish);
+  const feedback = [];
+
+  prompt.checks.forEach((rule) => {
+    if (!rule.test(normalized)) {
+      feedback.push(rule.message);
+    }
+  });
+
+  if (normalized.includes("soy en") || normalized.includes("somos en")) {
+    feedback.push("Location needs estar, not ser. For example, say 'estoy en casa', not 'soy en casa'.");
   }
-  return feedback.join(" ");
+
+  if (normalized.includes("yo yo")) {
+    feedback.push("You repeated 'yo' too often. Spanish usually sounds more natural with fewer repeated pronouns.");
+  }
+
+  if (feedback.length === 0) {
+    return {
+      ok: true,
+      html: `
+        <p><strong>Very good.</strong> Your Spanish matches the main ideas of the model paragraph.</p>
+        <p><strong>Model answer:</strong> ${prompt.spanish}</p>
+        <p><strong>English explanation:</strong> You used the right beginner patterns and vocabulary for this prompt.</p>
+      `
+    };
+  }
+
+  return {
+    ok: false,
+    html: `
+      <p><strong>Suggested correction:</strong> ${prompt.spanish}</p>
+      <p><strong>English explanation of mistakes:</strong></p>
+      <ul>${feedback.map((item) => `<li>${item}</li>`).join("")}</ul>
+      <p><strong>Why this matters:</strong> The correction uses only the verbs, places, feelings, and question forms already learned in Days 1 to 4.</p>
+      <p><strong>Try again:</strong> Rewrite the same paragraph once more, then move to a different paragraph.</p>
+    `
+    };
 }
 
 function translateParagraph(text) {
@@ -461,9 +548,16 @@ function loadFeedback() {
 
 function loadWriting() {
   const saved = window.localStorage.getItem(storageKeys.writing);
+  const savedPromptIndex = Number(window.localStorage.getItem(storageKeys.writingPromptIndex));
+  if (!Number.isNaN(savedPromptIndex) && writingPrompts[savedPromptIndex]) {
+    currentWritingPrompt = savedPromptIndex;
+  }
+  renderWritingPrompt();
   if (saved) {
     writingText.value = saved;
-    writingFeedback.textContent = evaluateWriting(saved);
+    const result = evaluateWriting(saved);
+    writingFeedback.innerHTML = result.html;
+    writingFeedback.classList.toggle("muted", false);
   }
 }
 
@@ -494,13 +588,30 @@ writingForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const value = writingText.value.trim();
   window.localStorage.setItem(storageKeys.writing, value);
-  writingFeedback.textContent = evaluateWriting(value);
+  const result = evaluateWriting(value);
+  writingFeedback.innerHTML = result.html;
+  writingFeedback.classList.toggle("muted", false);
 });
 
 clearWritingButton.addEventListener("click", () => {
   window.localStorage.removeItem(storageKeys.writing);
   writingText.value = "";
-  writingFeedback.textContent = "Saved writing cleared.";
+  writingFeedback.textContent = "Writing cleared. Use the current English paragraph and write it again in Spanish.";
+  writingFeedback.classList.add("muted");
+});
+
+nextWritingPromptButton.addEventListener("click", () => {
+  currentWritingPrompt = (currentWritingPrompt + 1) % writingPrompts.length;
+  window.localStorage.setItem(storageKeys.writingPromptIndex, String(currentWritingPrompt));
+  writingText.value = "";
+  window.localStorage.removeItem(storageKeys.writing);
+  renderWritingPrompt();
+  writingFeedback.textContent = "A different English paragraph is ready. Write it in Spanish using only learned vocabulary.";
+  writingFeedback.classList.add("muted");
+});
+
+showWritingModelButton.addEventListener("click", () => {
+  writingModel.classList.toggle("hidden");
 });
 
 feedbackForm.addEventListener("submit", (event) => {

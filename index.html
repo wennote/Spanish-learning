@@ -124,18 +124,23 @@
           <section class="practice-panel">
             <h3>Writing Practice</h3>
             <div class="prompt-box">
-              <p><strong>Prompt 1:</strong> Write a short self-introduction using <em>ser</em> and <em>estar</em>.</p>
-              <p><strong>Prompt 2:</strong> Write a daily routine with verbs like <em>estudiar</em>, <em>trabajar</em>, <em>hacer</em>, and <em>querer</em>.</p>
+              <p><strong>English paragraph</strong></p>
+              <p id="writing-prompt-text">Loading writing prompt...</p>
+              <div class="button-row">
+                <button id="next-writing-prompt" type="button" class="secondary-button">Next Paragraph</button>
+                <button id="show-writing-model" type="button" class="secondary-button">Show Model Answer</button>
+              </div>
+              <p id="writing-model" class="hidden"></p>
             </div>
             <form id="writing-form" class="feedback-form">
               <label for="writing-text">Your Spanish paragraph</label>
-              <textarea id="writing-text" rows="8" placeholder="Example: Yo soy de Florida. Hoy estoy en casa. Yo estudio español y trabajo en casa."></textarea>
+              <textarea id="writing-text" rows="8" placeholder="Write the English paragraph above in Spanish."></textarea>
               <div class="button-row">
-                <button type="submit">Save Writing</button>
+                <button type="submit">Check My Spanish</button>
                 <button id="clear-writing" type="button" class="secondary-button">Clear</button>
               </div>
             </form>
-            <div id="writing-feedback" class="result-box muted">Write a short paragraph. The site will give simple rule-based feedback.</div>
+            <div id="writing-feedback" class="result-box muted">Write the paragraph in Spanish. The site will compare it with a model answer and explain mistakes in English.</div>
           </section>
         </div>
       </article>

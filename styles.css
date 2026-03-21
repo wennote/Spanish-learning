@@ -356,6 +356,11 @@ textarea {
   background: rgba(255, 250, 242, 0.76);
 }
 
+#writing-model {
+  margin-top: 12px;
+  color: var(--accent-dark);
+}
+
 @media (max-width: 720px) {
   .shell {
     width: min(100% - 20px, 1180px);
