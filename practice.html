@@ -19,11 +19,13 @@
       <a class="tab-button" href="vocabulary.html">Vocabulary</a>
       <a class="tab-button" href="grammar.html">Grammar</a>
       <a class="tab-button" href="pronunciation.html">Pronunciation</a>
+      <a class="tab-button" href="review.html">Review</a>
       <a class="tab-button" href="flashcards.html">Flashcards</a>
-      <a class="tab-button" href="notes.html">Daily Notes</a>
       <a class="tab-button" href="stories.html">Stories</a>
       <a class="tab-button active" href="practice.html">Practice</a>
       <a class="tab-button" href="writing.html">Writing</a>
+      <a class="tab-button" href="summary.html">Summary</a>
+      <a class="tab-button" href="notes.html">Daily Notes</a>
     </nav>
 
     <section class="tab-panel active">
@@ -31,22 +33,22 @@
         <div class="section-header">
           <div>
             <h2>Practice</h2>
-            <p class="muted">Review mistakes, understand why they happened, and prepare for writing practice.</p>
+            <p class="muted">Build custom exercises and a generated quiz from the items you selected on the Vocabulary, Grammar, and Pronunciation pages.</p>
           </div>
         </div>
         <div class="practice-grid">
           <section class="practice-panel practice-quiz-panel">
-            <h3>Quick Review</h3>
+            <h3>Generated Quiz</h3>
             <div id="quiz-list" class="quiz-list"></div>
             <button id="check-quiz" type="button">Check Answers</button>
-            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score. Wrong answers will show the correct answer and a short explanation.</div>
+            <div id="quiz-result" class="result-box muted">Select study items first. The quiz on this page will be generated from those selections.</div>
           </section>
 
           <section class="practice-panel practice-essay-panel">
-            <h3>Practice Focus</h3>
-            <p class="muted">Use this page for quiz review. The Writing page holds the longer paragraph practice tasks.</p>
+            <h3>Custom Exercises</h3>
+            <p class="muted">The exercise list is built from your checked items so you can focus only on what you want to practice.</p>
             <div class="result-box">
-              <p><strong>Recommended order:</strong> 1. Check quiz mistakes. 2. Open Writing. 3. Draft your paragraph. 4. Compare with the model answer.</p>
+              <ul id="exercise-list" class="note-list"></ul>
             </div>
           </section>
         </div>

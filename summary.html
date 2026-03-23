@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spanish Learning - Flashcards</title>
+  <title>Spanish Learning - Summary</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
     <section class="hero">
       <p class="eyebrow">Spanish-learning</p>
       <div id="random-banner" class="random-banner" aria-label="Random decorative picture"></div>
-      <p class="hero-copy">Use click-to-reveal flashcards for quick review of the Spanish vocabulary set.</p>
+      <p class="hero-copy">Track selected study items, quiz performance, and next-step suggestions based on your recent work.</p>
     </section>
 
     <nav class="tab-bar" aria-label="Main pages">
@@ -20,27 +20,34 @@
       <a class="tab-button" href="grammar.html">Grammar</a>
       <a class="tab-button" href="pronunciation.html">Pronunciation</a>
       <a class="tab-button" href="review.html">Review</a>
-      <a class="tab-button active" href="flashcards.html">Flashcards</a>
+      <a class="tab-button" href="flashcards.html">Flashcards</a>
       <a class="tab-button" href="stories.html">Stories</a>
       <a class="tab-button" href="practice.html">Practice</a>
       <a class="tab-button" href="writing.html">Writing</a>
-      <a class="tab-button" href="summary.html">Summary</a>
+      <a class="tab-button active" href="summary.html">Summary</a>
       <a class="tab-button" href="notes.html">Daily Notes</a>
     </nav>
 
     <section class="tab-panel active">
       <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Flashcards</h2>
-            <p class="muted">Click any card to reveal the English translation, then click again to hide it.</p>
+        <h2>Learning Summary</h2>
+        <div class="info-grid">
+          <div class="info-panel">
+            <h3>Overview</h3>
+            <div id="summary-overview"></div>
+          </div>
+          <div class="info-panel">
+            <h3>Suggestions</h3>
+            <div id="summary-suggestions"></div>
           </div>
         </div>
-        <div id="flashcard-list" class="flashcard-grid"></div>
+        <article class="info-panel summary-history-panel">
+          <h3>Quiz History</h3>
+          <ul id="summary-history" class="note-list"></ul>
+        </article>
       </article>
     </section>
   </main>
-
   <script src="app.js"></script>
 </body>
 </html>

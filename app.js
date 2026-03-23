@@ -5,13 +5,18 @@ const topicFilters = document.getElementById("topic-filters");
 const grammarList = document.getElementById("grammar-list");
 const pronunciationList = document.getElementById("pronunciation-list");
 const flashcardList = document.getElementById("flashcard-list");
+const reviewContent = document.getElementById("review-content");
 const notesList = document.getElementById("notes-list");
 const storyList = document.getElementById("story-list");
 const storyGallery = document.getElementById("story-gallery");
 const nextStoryButton = document.getElementById("next-story");
+const exerciseList = document.getElementById("exercise-list");
 const quizList = document.getElementById("quiz-list");
 const checkQuizButton = document.getElementById("check-quiz");
 const quizResult = document.getElementById("quiz-result");
+const summaryOverview = document.getElementById("summary-overview");
+const summarySuggestions = document.getElementById("summary-suggestions");
+const summaryHistory = document.getElementById("summary-history");
 const essayPrompt = document.getElementById("essay-prompt");
 const essayHints = document.getElementById("essay-hints");
 const essayResponse = document.getElementById("essay-response");
@@ -26,6 +31,19 @@ const stopRecordingButton = document.getElementById("stop-recording");
 const recordingTarget = document.getElementById("recording-target");
 const recordingStatus = document.getElementById("recording-status");
 const recordingPlayback = document.getElementById("recording-playback");
+
+const STORAGE_KEYS = {
+  studySelections: "spanish-learning-selections",
+  quizHistory: "spanish-learning-quiz-history"
+};
+
+const selectionPageHrefs = new Set([
+  "review.html",
+  "flashcards.html",
+  "stories.html",
+  "practice.html",
+  "summary.html"
+]);
 
 const pronunciationSections = [
   {
@@ -173,7 +191,7 @@ const grammarPoints = [
       ]
     }
   }
-];
+].map((point) => ({ ...point, id: `grammar-${slugify(point.title)}` }));
 
 const filterOptions = ["All", "Verbs", "Feelings", "Places", "Questions"];
 
@@ -233,7 +251,7 @@ const vocabulary = [
   { spanish: "más", english: "more", chinese: "更; 更多", pos: "Adverb", day: "Day 5", examples: ["Quiero estudiar más.", "Hoy practico más español."] },
   { spanish: "corta", english: "short", chinese: "短的", pos: "Adjective", day: "Day 5", examples: ["Es una historia corta.", "La clase fue corta."] },
   { spanish: "sobre", english: "about", chinese: "关于", pos: "Preposition", day: "Day 5", examples: ["Escribo una historia sobre mi familia.", "Hablo sobre mi trabajo."] }
-].map((item) => ({ ...item, topic: inferTopic(item) }));
+].map((item) => ({ ...item, id: `vocab-${slugify(item.spanish)}`, topic: inferTopic(item) }));
 
 const noteDays = [
   {
@@ -463,9 +481,11 @@ let currentStory = 0;
 let currentEssay = 0;
 let activeTopicFilter = "All";
 let currentRecordingTarget = pronunciationSections[0].items[0];
+let currentPracticeQuestions = [];
 let mediaRecorder;
 let recordingChunks = [];
 let recordingStream;
+let studySelections = loadStudySelections();
 
 const essayPrompts = [
   {
@@ -538,6 +558,15 @@ function renderRandomBanner() {
   `;
 }
 
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function inferTopic(item) {
   const value = `${item.spanish} ${item.english} ${item.pos} ${item.examples.join(" ")}`.toLowerCase();
   if (item.pos === "Question" || value.includes("¿")) {
@@ -562,6 +591,147 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function loadStudySelections() {
+  const saved = window.localStorage.getItem(STORAGE_KEYS.studySelections);
+  if (!saved) {
+    return { vocabulary: [], grammar: [], pronunciation: [] };
+  }
+
+  try {
+    const parsed = JSON.parse(saved);
+    return {
+      vocabulary: Array.isArray(parsed.vocabulary) ? parsed.vocabulary : [],
+      grammar: Array.isArray(parsed.grammar) ? parsed.grammar : [],
+      pronunciation: Array.isArray(parsed.pronunciation) ? parsed.pronunciation : []
+    };
+  } catch {
+    return { vocabulary: [], grammar: [], pronunciation: [] };
+  }
+}
+
+function saveStudySelections() {
+  window.localStorage.setItem(STORAGE_KEYS.studySelections, JSON.stringify(studySelections));
+}
+
+function hasStudySelections() {
+  return studySelections.vocabulary.length > 0 || studySelections.grammar.length > 0 || studySelections.pronunciation.length > 0;
+}
+
+function currentPageHref() {
+  const path = window.location.pathname.split("/").pop();
+  return path || "index.html";
+}
+
+function updateSelectionNavigation() {
+  const mainNav = document.querySelector(".tab-bar");
+  if (!mainNav || mainNav.classList.contains("selection-tab-bar")) {
+    return;
+  }
+
+  let selectionGroup = document.querySelector(".selection-nav-group");
+  let selectionNav = document.querySelector(".selection-tab-bar");
+
+  if (!selectionGroup) {
+    selectionGroup = document.createElement("section");
+    selectionGroup.className = "selection-nav-group";
+    selectionGroup.innerHTML = `
+      <p class="selection-nav-label">Selected Study</p>
+      <p class="selection-nav-copy">These tabs are shown only for the items you selected in Vocabulary, Grammar, and Pronunciation.</p>
+    `;
+    selectionNav = document.createElement("nav");
+    selectionNav.className = "tab-bar selection-tab-bar";
+    selectionNav.setAttribute("aria-label", "Selection pages");
+    selectionGroup.appendChild(selectionNav);
+    mainNav.insertAdjacentElement("afterend", selectionGroup);
+  }
+
+  if (!selectionNav) {
+    return;
+  }
+
+  if (!selectionNav.children.length) {
+    const selectionLinks = [...mainNav.querySelectorAll(".tab-button")]
+      .filter((link) => selectionPageHrefs.has(link.getAttribute("href")));
+
+    selectionLinks.forEach((link) => {
+      selectionNav.appendChild(link.cloneNode(true));
+      link.remove();
+    });
+  }
+
+  const shouldShowSelectionTabs = hasStudySelections() || selectionPageHrefs.has(currentPageHref());
+  selectionGroup.hidden = !shouldShowSelectionTabs;
+}
+
+function getPronunciationItemKey(text) {
+  return `pronunciation-${slugify(text)}`;
+}
+
+function isSelected(group, key) {
+  return studySelections[group].includes(key);
+}
+
+function toggleSelection(group, key) {
+  if (isSelected(group, key)) {
+    studySelections[group] = studySelections[group].filter((item) => item !== key);
+  } else {
+    studySelections[group] = [...studySelections[group], key];
+  }
+  saveStudySelections();
+  updateSelectionNavigation();
+}
+
+function getSelectedVocabulary() {
+  return vocabulary.filter((item) => isSelected("vocabulary", item.id));
+}
+
+function getSelectedGrammar() {
+  return grammarPoints.filter((point) => isSelected("grammar", point.id));
+}
+
+function getAllPronunciationItems() {
+  return pronunciationSections.flatMap((section) =>
+    section.items.map((item) => ({
+      key: getPronunciationItemKey(item),
+      title: section.title,
+      text: item
+    }))
+  );
+}
+
+function getSelectedPronunciationItems() {
+  return getAllPronunciationItems().filter((item) => isSelected("pronunciation", item.key));
+}
+
+function loadQuizHistory() {
+  const saved = window.localStorage.getItem(STORAGE_KEYS.quizHistory);
+  if (!saved) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveQuizAttempt(score, total) {
+  const history = loadQuizHistory();
+  history.unshift({
+    score,
+    total,
+    timestamp: new Date().toISOString(),
+    selected: {
+      vocabulary: studySelections.vocabulary.length,
+      grammar: studySelections.grammar.length,
+      pronunciation: studySelections.pronunciation.length
+    }
+  });
+  window.localStorage.setItem(STORAGE_KEYS.quizHistory, JSON.stringify(history.slice(0, 10)));
 }
 
 function getFilteredVocabulary() {
@@ -594,6 +764,7 @@ function renderVocabulary(items) {
       <table class="vocab-table">
         <thead>
           <tr>
+            <th scope="col">Pick</th>
             <th scope="col">Spanish</th>
             <th scope="col">English</th>
             <th scope="col">Chinese</th>
@@ -603,6 +774,9 @@ function renderVocabulary(items) {
         <tbody>
           ${items.map((item) => `
             <tr>
+              <td>
+                <input class="study-checkbox" type="checkbox" data-selection-group="vocabulary" data-selection-key="${item.id}" ${isSelected("vocabulary", item.id) ? "checked" : ""} aria-label="Select ${item.spanish} for review">
+              </td>
               <td class="vocab-spanish">
                 <span>${item.spanish}</span>
                 <button class="audio-icon-button" type="button" data-speak="${item.spanish}" aria-label="Play pronunciation for ${item.spanish}">
@@ -638,7 +812,13 @@ function renderGrammar() {
   grammarList.innerHTML = grammarPoints.map((point) => `
     <article class="grammar-card">
       <div class="grammar-heading">
-        <p class="grammar-kicker">Grammar Point</p>
+        <div class="grammar-title-row">
+          <p class="grammar-kicker">Grammar Point</p>
+          <label class="checkbox-label">
+            <input class="study-checkbox" type="checkbox" data-selection-group="grammar" data-selection-key="${point.id}" ${isSelected("grammar", point.id) ? "checked" : ""}>
+            <span>Select</span>
+          </label>
+        </div>
         <h3>${point.title}</h3>
         <p class="grammar-rule">${point.rule}</p>
       </div>
@@ -683,7 +863,8 @@ function renderFlashcards(items) {
   if (!flashcardList) {
     return;
   }
-  flashcardList.innerHTML = items.map((item) => `
+  const sourceItems = getSelectedVocabulary().length ? getSelectedVocabulary() : items;
+  flashcardList.innerHTML = sourceItems.map((item) => `
     <button class="flashcard" type="button" aria-label="Show English translation for ${item.spanish}" aria-pressed="false">
       <span class="flashcard-label">Spanish</span>
       <span class="flashcard-front">${item.spanish}</span>
@@ -710,14 +891,184 @@ function renderPronunciation() {
       <h3>${section.title}</h3>
       <div class="pronunciation-items">
         ${section.items.map((item) => `
-          <button class="pronunciation-button" type="button" data-speak="${item}" aria-label="Play pronunciation for ${item}">
-            <span class="pronunciation-text">${item}</span>
-            <span class="pronunciation-play">Play</span>
-          </button>
+          <div class="pronunciation-row">
+            <label class="checkbox-label">
+              <input class="study-checkbox" type="checkbox" data-selection-group="pronunciation" data-selection-key="${getPronunciationItemKey(item)}" ${isSelected("pronunciation", getPronunciationItemKey(item)) ? "checked" : ""}>
+              <span>Select</span>
+            </label>
+            <button class="pronunciation-button" type="button" data-speak="${item}" aria-label="Play pronunciation for ${item}">
+              <span class="pronunciation-text">${item}</span>
+              <span class="pronunciation-play">Play</span>
+            </button>
+          </div>
         `).join("")}
       </div>
     </article>
   `).join("");
+}
+
+function renderReview() {
+  if (!reviewContent) {
+    return;
+  }
+
+  const selectedVocabulary = getSelectedVocabulary();
+  const selectedGrammar = getSelectedGrammar();
+  const selectedPronunciation = getSelectedPronunciationItems();
+
+  if (!selectedVocabulary.length && !selectedGrammar.length && !selectedPronunciation.length) {
+    reviewContent.innerHTML = `
+      <article class="info-panel">
+        <h3>No Items Selected Yet</h3>
+        <p>Select items from Vocabulary, Grammar, and Pronunciation to build a focused review page.</p>
+      </article>
+    `;
+    return;
+  }
+
+  reviewContent.innerHTML = `
+    ${selectedVocabulary.length ? `
+      <article class="card">
+        <h2>Vocabulary Review</h2>
+        <div class="review-grid">
+          ${selectedVocabulary.map((item) => `
+            <section class="review-card">
+              <h3>${item.spanish}</h3>
+              <p><strong>English:</strong> ${item.english}</p>
+              <p><strong>Chinese:</strong> ${item.chinese}</p>
+              <p><strong>Why it matters:</strong> ${item.examples[0]}</p>
+            </section>
+          `).join("")}
+        </div>
+      </article>
+    ` : ""}
+    ${selectedGrammar.length ? `
+      <article class="card">
+        <h2>Grammar Review</h2>
+        <div class="review-grid">
+          ${selectedGrammar.map((point) => `
+            <section class="review-card">
+              <h3>${point.title}</h3>
+              <p>${point.rule}</p>
+              <ul class="note-list">${point.details.map((detail) => `<li>${detail}</li>`).join("")}</ul>
+            </section>
+          `).join("")}
+        </div>
+      </article>
+    ` : ""}
+    ${selectedPronunciation.length ? `
+      <article class="card">
+        <h2>Pronunciation Review</h2>
+        <div class="review-grid">
+          ${selectedPronunciation.map((item) => `
+            <section class="review-card">
+              <h3>${item.text}</h3>
+              <p><strong>Section:</strong> ${item.title}</p>
+              <p><strong>Practice idea:</strong> Play it, repeat it three times, then record your own version.</p>
+            </section>
+          `).join("")}
+        </div>
+      </article>
+    ` : ""}
+  `;
+}
+
+function generatePracticeQuestions() {
+  const selectedVocabulary = getSelectedVocabulary();
+  const selectedGrammar = getSelectedGrammar();
+  const selectedPronunciation = getSelectedPronunciationItems();
+  const questions = [];
+
+  selectedVocabulary.slice(0, 5).forEach((item) => {
+    const distractors = vocabulary
+      .filter((word) => word.id !== item.id)
+      .slice(0, 3)
+      .map((word) => word.english);
+    questions.push({
+      prompt: `What is the English meaning of "${item.spanish}"?`,
+      options: [item.english, ...distractors].sort(() => Math.random() - 0.5),
+      answer: item.english,
+      explanation: `The correct meaning of ${item.spanish} is "${item.english}".`
+    });
+  });
+
+  selectedGrammar.slice(0, 4).forEach((point) => {
+    questions.push({
+      prompt: `Which grammar topic matches this idea: ${point.rule}`,
+      options: [point.title, ...grammarPoints.filter((item) => item.id !== point.id).slice(0, 3).map((item) => item.title)].sort(() => Math.random() - 0.5),
+      answer: point.title,
+      explanation: `${point.title} is the grammar point connected to that rule.`
+    });
+  });
+
+  selectedPronunciation.slice(0, 4).forEach((item) => {
+    questions.push({
+      prompt: `Which pronunciation target belongs to the "${item.title}" section?`,
+      options: [item.text, ...getAllPronunciationItems().filter((entry) => entry.key !== item.key).slice(0, 3).map((entry) => entry.text)].sort(() => Math.random() - 0.5),
+      answer: item.text,
+      explanation: `"${item.text}" is one of your selected pronunciation targets from ${item.title}.`
+    });
+  });
+
+  return questions;
+}
+
+function renderExercises() {
+  if (!exerciseList) {
+    return;
+  }
+
+  const selectedVocabulary = getSelectedVocabulary();
+  const selectedGrammar = getSelectedGrammar();
+  const selectedPronunciation = getSelectedPronunciationItems();
+
+  const exercises = [
+    ...selectedVocabulary.map((item) => `Say the meaning of "${item.spanish}" and then use it in a short Spanish sentence.`),
+    ...selectedGrammar.map((point) => `Explain ${point.title} in your own words, then write one example.`),
+    ...selectedPronunciation.map((item) => `Play and repeat "${item.text}" three times, then record yourself once.`)
+  ];
+
+  exerciseList.innerHTML = exercises.length
+    ? exercises.map((exercise) => `<li>${exercise}</li>`).join("")
+    : "<li>Select items from Vocabulary, Grammar, or Pronunciation to build custom exercises.</li>";
+}
+
+function renderSummary() {
+  if (!summaryOverview || !summarySuggestions || !summaryHistory) {
+    return;
+  }
+
+  const history = loadQuizHistory();
+  const latest = history[0];
+  const selectedCounts = {
+    vocabulary: getSelectedVocabulary().length,
+    grammar: getSelectedGrammar().length,
+    pronunciation: getSelectedPronunciationItems().length
+  };
+
+  summaryOverview.innerHTML = `
+    <p><strong>Selected vocabulary:</strong> ${selectedCounts.vocabulary}</p>
+    <p><strong>Selected grammar points:</strong> ${selectedCounts.grammar}</p>
+    <p><strong>Selected pronunciation items:</strong> ${selectedCounts.pronunciation}</p>
+    <p><strong>Latest quiz score:</strong> ${latest ? `${latest.score} / ${latest.total}` : "No quiz attempts yet."}</p>
+  `;
+
+  const suggestions = [];
+  if (selectedCounts.vocabulary < 3) suggestions.push("Select a few more vocabulary items to make review and quiz results more useful.");
+  if (selectedCounts.grammar < 2) suggestions.push("Add more grammar points so practice includes both rules and examples.");
+  if (selectedCounts.pronunciation < 2) suggestions.push("Select more pronunciation items to balance speaking practice with reading and writing.");
+  if (latest && latest.total > 0) {
+    const ratio = latest.score / latest.total;
+    if (ratio >= 0.8) suggestions.push("Your latest quiz score is strong. Move to longer writing and speaking practice.");
+    if (ratio < 0.8) suggestions.push("Review the missed quiz items and repeat the selected pronunciation lines before trying again.");
+  } else {
+    suggestions.push("After selecting items, go to Practice and complete a generated quiz to measure your current understanding.");
+  }
+
+  summarySuggestions.innerHTML = `<ul class="note-list">${suggestions.map((item) => `<li>${item}</li>`).join("")}</ul>`;
+  summaryHistory.innerHTML = history.length
+    ? history.map((item) => `<li>${new Date(item.timestamp).toLocaleString()}: ${item.score} / ${item.total}</li>`).join("")
+    : "<li>No quiz history yet.</li>";
 }
 
 function speakSpanish(text) {
@@ -800,6 +1151,14 @@ function renderStories(index = currentStory) {
     return;
   }
   const story = stories[index];
+  const selectedStoryFocus = [
+    ...getSelectedVocabulary().map((item) => item.spanish),
+    ...getSelectedPronunciationItems().map((item) => item.text)
+  ];
+  const focusItems = selectedStoryFocus.length ? selectedStoryFocus.slice(0, 10) : story.focus;
+  const focusLabel = selectedStoryFocus.length
+    ? "Selected practice focus"
+    : "Story focus";
 
   storyList.innerHTML = `
     <article class="story-card">
@@ -811,8 +1170,9 @@ function renderStories(index = currentStory) {
       </div>
       <p class="story-text">${story.spanish}</p>
       <p class="story-translation"><strong>English support:</strong> ${story.english}</p>
+      <p class="muted"><strong>${focusLabel}:</strong> ${selectedStoryFocus.length ? "This story still uses other familiar vocabulary, but the chips below prioritize your selected items." : "These are the built-in story targets."}</p>
       <div class="story-focus">
-        ${story.focus.map((item) => `<span class="focus-chip">${item}</span>`).join("")}
+        ${focusItems.map((item) => `<span class="focus-chip">${item}</span>`).join("")}
       </div>
     </article>
   `;
@@ -1044,7 +1404,15 @@ function renderQuiz() {
   if (!quizList) {
     return;
   }
-  quizList.innerHTML = quizQuestions.map((question, index) => `
+  currentPracticeQuestions = generatePracticeQuestions();
+  const sourceQuestions = currentPracticeQuestions.length ? currentPracticeQuestions : [];
+
+  if (!sourceQuestions.length) {
+    quizList.innerHTML = '<article class="quiz-card"><p>Select items from Vocabulary, Grammar, or Pronunciation to generate a quiz.</p></article>';
+    return;
+  }
+
+  quizList.innerHTML = sourceQuestions.map((question, index) => `
     <article class="quiz-card">
       <p><strong>${index + 1}.</strong> ${question.prompt}</p>
       <div class="quiz-options">
@@ -1065,8 +1433,14 @@ function checkQuiz() {
   }
   let score = 0;
   const review = [];
+  const sourceQuestions = currentPracticeQuestions.length ? currentPracticeQuestions : quizQuestions;
 
-  quizQuestions.forEach((question, index) => {
+  if (!currentPracticeQuestions.length) {
+    quizResult.textContent = "Select items first. The quiz is generated from your selections.";
+    return;
+  }
+
+  sourceQuestions.forEach((question, index) => {
     const card = quizList.children[index];
     const selected = document.querySelector(`input[name="quiz-${index}"]:checked`);
 
@@ -1088,7 +1462,10 @@ function checkQuiz() {
     }
   });
 
-  const summary = `<p><strong>Score:</strong> ${score} out of ${quizQuestions.length}.</p>`;
+  saveQuizAttempt(score, sourceQuestions.length);
+  renderSummary();
+
+  const summary = `<p><strong>Score:</strong> ${score} out of ${sourceQuestions.length}.</p>`;
   const details = review.length
     ? `<p><strong>Review the missed items:</strong></p><ul class="analysis-list">${review.join("")}</ul>`
     : "<p>All answers were correct. Repeat them aloud once more for speaking practice.</p>";
@@ -1195,6 +1572,19 @@ if (vocabList) {
     setRecordingTarget(button.dataset.speak);
     speakSpanish(button.dataset.speak);
   });
+
+  vocabList.addEventListener("change", (event) => {
+    const checkbox = event.target.closest(".study-checkbox");
+    if (!checkbox) {
+      return;
+    }
+
+    toggleSelection(checkbox.dataset.selectionGroup, checkbox.dataset.selectionKey);
+    renderReview();
+    renderExercises();
+    renderQuiz();
+    renderSummary();
+  });
 }
 
 if (pronunciationList) {
@@ -1206,6 +1596,34 @@ if (pronunciationList) {
 
     setRecordingTarget(button.dataset.speak);
     speakSpanish(button.dataset.speak);
+  });
+
+  pronunciationList.addEventListener("change", (event) => {
+    const checkbox = event.target.closest(".study-checkbox");
+    if (!checkbox) {
+      return;
+    }
+
+    toggleSelection(checkbox.dataset.selectionGroup, checkbox.dataset.selectionKey);
+    renderReview();
+    renderExercises();
+    renderQuiz();
+    renderSummary();
+  });
+}
+
+if (grammarList) {
+  grammarList.addEventListener("change", (event) => {
+    const checkbox = event.target.closest(".study-checkbox");
+    if (!checkbox) {
+      return;
+    }
+
+    toggleSelection(checkbox.dataset.selectionGroup, checkbox.dataset.selectionKey);
+    renderReview();
+    renderExercises();
+    renderQuiz();
+    renderSummary();
   });
 }
 
@@ -1278,6 +1696,7 @@ if (stopRecordingButton) {
   stopRecordingButton.addEventListener("click", stopRecording);
 }
 
+updateSelectionNavigation();
 renderTopicFilters();
 renderRandomBanner();
 renderVocabulary(getFilteredVocabulary());
@@ -1285,7 +1704,10 @@ renderGrammar();
 setRecordingTarget(currentRecordingTarget);
 renderPronunciation();
 renderFlashcards(getFilteredVocabulary());
+renderReview();
 renderNotes();
 renderStories();
+renderExercises();
 renderQuiz();
 renderEssay(currentEssay);
+renderSummary();
