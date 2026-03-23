@@ -1,7 +1,12 @@
 const tabs = document.querySelectorAll(".tab-button");
 const panels = document.querySelectorAll(".tab-panel");
+const randomBanner = document.getElementById("random-banner");
 const vocabList = document.getElementById("vocab-list");
 const vocabSearch = document.getElementById("vocab-search");
+const topicFilters = document.getElementById("topic-filters");
+const grammarList = document.getElementById("grammar-list");
+const pronunciationList = document.getElementById("pronunciation-list");
+const flashcardList = document.getElementById("flashcard-list");
 const notesList = document.getElementById("notes-list");
 const storyList = document.getElementById("story-list");
 const storyGallery = document.getElementById("story-gallery");
@@ -14,68 +19,222 @@ const essayHints = document.getElementById("essay-hints");
 const essayResponse = document.getElementById("essay-response");
 const nextEssayButton = document.getElementById("next-essay");
 const showEssayAnswerButton = document.getElementById("show-essay-answer");
+const checkWritingButton = document.getElementById("check-writing");
 const essayAnswer = document.getElementById("essay-answer");
-const feedbackForm = document.getElementById("feedback-form");
-const feedbackText = document.getElementById("feedback-text");
-const feedbackStatus = document.getElementById("feedback-status");
-const clearFeedbackButton = document.getElementById("clear-feedback");
+const writingFeedback = document.getElementById("writing-feedback");
+const playRecordingTargetButton = document.getElementById("play-recording-target");
+const startRecordingButton = document.getElementById("start-recording");
+const stopRecordingButton = document.getElementById("stop-recording");
+const recordingTarget = document.getElementById("recording-target");
+const recordingStatus = document.getElementById("recording-status");
+const recordingPlayback = document.getElementById("recording-playback");
+
+const pronunciationSections = [
+  {
+    title: "Key Words",
+    items: [
+      "hablar",
+      "estar",
+      "tener",
+      "hacer",
+      "querer",
+      "mi familia",
+      "ayer",
+      "después"
+    ]
+  },
+  {
+    title: "Model Sentences",
+    items: [
+      "Me llamo Wen y vivo en Florida.",
+      "Hoy estoy contento porque estudio español en casa.",
+      "Mi familia vive en China.",
+      "Ayer fui a la escuela y después cociné arroz.",
+      "Quiero hablar más español cada día.",
+      "Por la mañana estudio, trabajo y hago la comida."
+    ]
+  }
+];
+
+const grammarPoints = [
+  {
+    title: "Regular Present Tense",
+    rule: "Spanish infinitives end in -ar, -er, or -ir. Remove the ending and add the correct present tense ending for the subject.",
+    details: [
+      "Use these endings for regular verbs: -ar -> o, as, a, amos, an; -er -> o, es, e, emos, en; -ir -> o, es, e, imos, en.",
+      "The subject pronoun is often optional because the verb ending already shows who is doing the action.",
+      "This pattern is used for habits, daily routines, and actions happening now."
+    ],
+    examples: ["hablar -> hablo", "comer -> comemos", "vivir -> viven"],
+    table: {
+      headers: ["Subject", "-ar", "-er", "-ir"],
+      rows: [
+        ["yo", "-o", "-o", "-o"],
+        ["tú", "-as", "-es", "-es"],
+        ["él / ella / usted", "-a", "-e", "-e"],
+        ["nosotros", "-amos", "-emos", "-imos"],
+        ["ellos / ustedes", "-an", "-en", "-en"]
+      ]
+    }
+  },
+  {
+    title: "Ser vs Estar",
+    rule: "Use ser for identity, origin, and general description. Use estar for location and temporary condition.",
+    details: [
+      "Ser answers questions like who someone is, where they are from, or what something is generally like.",
+      "Estar is used for where someone or something is and how a person feels right now.",
+      "A common beginner mistake is using ser for location. Say `estoy en casa`, not `soy en casa`."
+    ],
+    examples: ["Soy de Florida.", "Estoy en casa.", "Hoy estoy contento."],
+    table: {
+      headers: ["Subject", "ser", "estar"],
+      rows: [
+        ["yo", "soy", "estoy"],
+        ["tú", "eres", "estás"],
+        ["él / ella / usted", "es", "está"],
+        ["nosotros", "somos", "estamos"],
+        ["ellos / ustedes", "son", "están"]
+      ]
+    }
+  },
+  {
+    title: "Question Words",
+    rule: "Question words ask for specific information and usually start the question.",
+    details: [
+      "Use `qué` for what, `dónde` for where, `cuándo` for when, `cómo` for how, and `quién` for who.",
+      "Spanish uses opening and closing question marks: `¿ ... ?`.",
+      "These words help build speaking practice because you can answer them with short, useful sentences."
+    ],
+    examples: ["¿Qué haces?", "¿Dónde vas?", "¿Cómo estás?"],
+    table: {
+      headers: ["Spanish", "English", "Use"],
+      rows: [
+        ["¿Qué?", "What?", "thing or action"],
+        ["¿Dónde?", "Where?", "place"],
+        ["¿Cuándo?", "When?", "time"],
+        ["¿Cómo?", "How?", "condition or manner"],
+        ["¿Quién?", "Who?", "person"]
+      ]
+    }
+  },
+  {
+    title: "Simple Past",
+    rule: "Use the preterite for completed actions in the past, especially with time words like ayer.",
+    details: [
+      "Regular -ar verbs in the yo form often end in -é, such as `trabajé`, `estudié`, and `cociné`.",
+      "Some important verbs are irregular and must be memorized: `ir -> fui`, `tener -> tuve`, `hacer -> hice`, `querer -> quise`.",
+      "This tense is useful for short finished actions: where you went, what you did, and what happened yesterday."
+    ],
+    examples: ["Ayer fui a la escuela.", "Ayer trabajé.", "Ayer hice arroz."],
+    table: {
+      headers: ["Infinitive", "Yo Preterite", "Type"],
+      rows: [
+        ["trabajar", "trabajé", "regular -ar"],
+        ["estudiar", "estudié", "regular -ar"],
+        ["cocinar", "cociné", "regular -ar"],
+        ["ir", "fui", "irregular"],
+        ["tener", "tuve", "irregular"],
+        ["hacer", "hice", "irregular"],
+        ["querer", "quise", "irregular"]
+      ]
+    }
+  },
+  {
+    title: "Connectors",
+    rule: "Small linking words help combine ideas into longer sentences.",
+    details: [
+      "Use `porque` to give a reason, `pero` to show contrast, and `después` to show sequence.",
+      "These words make your writing sound more natural because they connect short statements.",
+      "A good beginner goal is to link two simple ideas instead of writing only isolated sentences."
+    ],
+    examples: ["porque = because", "pero = but", "después = afterward"],
+    table: {
+      headers: ["Connector", "Meaning", "Example"],
+      rows: [
+        ["porque", "because", "Estoy contento porque estudio."],
+        ["pero", "but", "Quiero pizza, pero hago arroz."],
+        ["después", "afterward", "Después estudio un poco más."]
+      ]
+    }
+  },
+  {
+    title: "Useful Sentence Order",
+    rule: "A simple beginner pattern is time + subject + verb + extra information.",
+    details: [
+      "You can start with words like `hoy`, `ayer`, `después`, or `por la mañana` to make the time clear.",
+      "Then add the action and one more detail such as place, object, or feeling.",
+      "This pattern helps build easy paragraphs: `Hoy estudio español en casa.`"
+    ],
+    examples: ["Hoy estudio español en casa.", "Ayer cociné arroz después del trabajo.", "Por la noche estoy cansado pero contento."],
+    table: {
+      headers: ["Part", "Purpose", "Example"],
+      rows: [
+        ["Time", "sets when", "Hoy / Ayer / Después"],
+        ["Verb", "main action", "estudio / cociné / estoy"],
+        ["Extra detail", "place, object, feeling", "en casa / arroz / contento"]
+      ]
+    }
+  }
+];
+
+const filterOptions = ["All", "Verbs", "Feelings", "Places", "Questions"];
 
 const vocabulary = [
-  { spanish: "hablar", english: "to speak", chinese: "说", pos: "Verb", day: "Day 1", example: "Yo hablo español." },
-  { spanish: "comer", english: "to eat", chinese: "吃", pos: "Verb", day: "Day 1", example: "Ellos comen pizza." },
-  { spanish: "vivir", english: "to live", chinese: "住; 生活", pos: "Verb", day: "Day 1", example: "Yo vivo en Florida." },
-  { spanish: "estudiar", english: "to study", chinese: "学习", pos: "Verb", day: "Day 1", example: "Nosotros estudiamos español." },
-  { spanish: "trabajar", english: "to work", chinese: "工作", pos: "Verb", day: "Day 1", example: "Yo trabajo en casa." },
-  { spanish: "cocinar", english: "to cook", chinese: "做饭", pos: "Verb", day: "Day 1", example: "Yo cocino en casa." },
-  { spanish: "limpiar", english: "to clean", chinese: "打扫", pos: "Verb", day: "Day 1", example: "Ella limpia." },
-  { spanish: "la casa", english: "the house", chinese: "房子; 家", pos: "Noun", day: "Day 1", example: "Yo vivo en casa." },
-  { spanish: "la escuela", english: "the school", chinese: "学校", pos: "Noun", day: "Day 1", example: "Nosotros estudiamos en la escuela." },
-  { spanish: "la comida", english: "food / meal", chinese: "食物; 饭", pos: "Noun", day: "Day 1", example: "Ellos comen la comida." },
-  { spanish: "ser", english: "to be", chinese: "是", pos: "Verb", day: "Day 2", example: "Yo soy de Florida." },
-  { spanish: "estar", english: "to be", chinese: "在; 处于", pos: "Verb", day: "Day 2", example: "Yo estoy en casa." },
-  { spanish: "estudiante", english: "student", chinese: "学生", pos: "Noun", day: "Day 2", example: "Yo soy un estudiante de español." },
-  { spanish: "hoy", english: "today", chinese: "今天", pos: "Adverb", day: "Day 2", example: "Hoy estoy cansado." },
-  { spanish: "cansado", english: "tired", chinese: "累的", pos: "Adjective", day: "Day 2", example: "Hoy estoy cansado." },
-  { spanish: "ocupado", english: "busy", chinese: "忙的", pos: "Adjective", day: "Day 2", example: "Hoy estoy ocupado." },
-  { spanish: "contento", english: "happy", chinese: "开心的", pos: "Adjective", day: "Day 2", example: "Hoy estoy contento." },
-  { spanish: "ir", english: "to go", chinese: "去", pos: "Verb", day: "Day 3", example: "Yo voy a casa." },
-  { spanish: "tener", english: "to have", chinese: "有", pos: "Verb", day: "Day 3", example: "Yo tengo trabajo." },
-  { spanish: "hacer", english: "to do / to make", chinese: "做; 制作", pos: "Verb", day: "Day 3", example: "Yo hago la comida en casa." },
-  { spanish: "querer", english: "to want", chinese: "想要", pos: "Verb", day: "Day 3", example: "Yo quiero pizza." },
-  { spanish: "tranquilo", english: "calm", chinese: "平静的", pos: "Adjective", day: "Day 3", example: "Hoy estoy tranquilo." },
-  { spanish: "nervioso", english: "nervous", chinese: "紧张的", pos: "Adjective", day: "Day 3", example: "Hoy estoy nervioso." },
-  { spanish: "orgulloso", english: "proud", chinese: "自豪的", pos: "Adjective", day: "Day 3", example: "Hoy estoy orgulloso." },
-  { spanish: "¿Qué?", english: "What?", chinese: "什么?", pos: "Question", day: "Day 4", example: "¿Qué quieres comer hoy?" },
-  { spanish: "¿Dónde?", english: "Where?", chinese: "哪里?", pos: "Question", day: "Day 4", example: "¿Dónde vas hoy?" },
-  { spanish: "¿Cuándo?", english: "When?", chinese: "什么时候?", pos: "Question", day: "Day 4", example: "¿Cuándo vas a la escuela?" },
-  { spanish: "¿Cómo?", english: "How?", chinese: "怎么样?; 如何?", pos: "Question", day: "Day 4", example: "¿Cómo estás hoy?" },
-  { spanish: "¿Quién?", english: "Who?", chinese: "谁?", pos: "Question", day: "Day 4", example: "¿Quién?" },
-  { spanish: "me llamo", english: "my name is", chinese: "我叫", pos: "Phrase", day: "Day 5", example: "Me llamo Wen." },
-  { spanish: "mi madre", english: "my mother", chinese: "我的妈妈", pos: "Noun", day: "Day 5", example: "Mi madre se llama Laura." },
-  { spanish: "mi padre", english: "my father", chinese: "我的爸爸", pos: "Noun", day: "Day 5", example: "Mi padre se llama Paul." },
-  { spanish: "mi hermano", english: "my brother", chinese: "我的兄弟", pos: "Noun", day: "Day 5", example: "Mi hermano se llama Wen." },
-  { spanish: "mi hermana", english: "my sister", chinese: "我的姐妹", pos: "Noun", day: "Day 5", example: "Mi hermana se llama Jade." },
-  { spanish: "tengo", english: "I have", chinese: "我有", pos: "Verb", day: "Day 5", example: "Tengo dos hermanos." },
-  { spanish: "mi familia", english: "my family", chinese: "我的家人", pos: "Noun", day: "Day 5", example: "Mi familia vive en China." },
-  { spanish: "ayer", english: "yesterday", chinese: "昨天", pos: "Adverb", day: "Day 5", example: "Ayer fui a la escuela." },
-  { spanish: "fui", english: "I went (ir past)", chinese: "我去了", pos: "Verb", day: "Day 5", example: "Ayer fui a la escuela." },
-  { spanish: "tuve", english: "I had (tener past)", chinese: "我有过; 我曾有", pos: "Verb", day: "Day 5", example: "Ayer tuve trabajo." },
-  { spanish: "hice", english: "I did/made (hacer past)", chinese: "我做了", pos: "Verb", day: "Day 5", example: "Ayer hice la comida en casa." },
-  { spanish: "quise", english: "I wanted (querer past)", chinese: "我想要过", pos: "Verb", day: "Day 5", example: "Ayer quise pizza." },
-  { spanish: "estudié", english: "I studied (estudiar past)", chinese: "我学习了", pos: "Verb", day: "Day 5", example: "Ayer estudié español en casa." },
-  { spanish: "trabajé", english: "I worked (trabajar past)", chinese: "我工作了", pos: "Verb", day: "Day 5", example: "Ayer trabajé." },
-  { spanish: "cociné", english: "I cooked (cocinar past)", chinese: "我做饭了", pos: "Verb", day: "Day 5", example: "Ayer cociné la comida." },
-  { spanish: "hablé", english: "I spoke (hablar past)", chinese: "我说了", pos: "Verb", day: "Day 5", example: "Ayer hablé español." },
-  { spanish: "porque", english: "because", chinese: "因为", pos: "Conjunction", day: "Day 5", example: "Estoy contento porque estudio español." },
-  { spanish: "pero", english: "but", chinese: "但是", pos: "Conjunction", day: "Day 5", example: "Quise pizza, pero hice arroz." },
-  { spanish: "después", english: "after; afterward", chinese: "之后", pos: "Adverb", day: "Day 5", example: "Después estudié un poco más." },
-  { spanish: "un poco más", english: "a little more", chinese: "再多一点", pos: "Phrase", day: "Day 5", example: "Después estudié un poco más." },
-  { spanish: "también", english: "also", chinese: "也", pos: "Adverb", day: "Day 5", example: "También hablé con mi familia." },
-  { spanish: "arroz", english: "rice", chinese: "米饭", pos: "Noun", day: "Day 5", example: "Hice arroz en casa." },
-  { spanish: "más", english: "more", chinese: "更; 更多", pos: "Adverb", day: "Day 5", example: "Quiero estudiar más." },
-  { spanish: "corta", english: "short", chinese: "短的", pos: "Adjective", day: "Day 5", example: "Es una historia corta." },
-  { spanish: "sobre", english: "about", chinese: "关于", pos: "Preposition", day: "Day 5", example: "Escribo una historia sobre mi familia." }
-];
+  { spanish: "hablar", english: "to speak", chinese: "说", pos: "Verb", day: "Day 1", examples: ["Yo hablo español.", "Nosotros hablamos en clase."] },
+  { spanish: "comer", english: "to eat", chinese: "吃", pos: "Verb", day: "Day 1", examples: ["Ellos comen pizza.", "Yo como arroz en casa."] },
+  { spanish: "vivir", english: "to live", chinese: "住; 生活", pos: "Verb", day: "Day 1", examples: ["Yo vivo en Florida.", "Mi familia vive en China."] },
+  { spanish: "estudiar", english: "to study", chinese: "学习", pos: "Verb", day: "Day 1", examples: ["Nosotros estudiamos español.", "Yo estudio en casa hoy."] },
+  { spanish: "trabajar", english: "to work", chinese: "工作", pos: "Verb", day: "Day 1", examples: ["Yo trabajo en casa.", "Ellos trabajan mucho."] },
+  { spanish: "cocinar", english: "to cook", chinese: "做饭", pos: "Verb", day: "Day 1", examples: ["Yo cocino en casa.", "Mi madre cocina arroz."] },
+  { spanish: "limpiar", english: "to clean", chinese: "打扫", pos: "Verb", day: "Day 1", examples: ["Ella limpia.", "Nosotros limpiamos la casa."] },
+  { spanish: "la casa", english: "the house", chinese: "房子; 家", pos: "Noun", day: "Day 1", examples: ["Yo vivo en casa.", "La casa es tranquila."] },
+  { spanish: "la escuela", english: "the school", chinese: "学校", pos: "Noun", day: "Day 1", examples: ["Nosotros estudiamos en la escuela.", "La escuela está en la ciudad."] },
+  { spanish: "la comida", english: "food / meal", chinese: "食物; 饭", pos: "Noun", day: "Day 1", examples: ["Ellos comen la comida.", "La comida está lista."] },
+  { spanish: "ser", english: "to be", chinese: "是", pos: "Verb", day: "Day 2", examples: ["Yo soy de Florida.", "Nosotros somos estudiantes."] },
+  { spanish: "estar", english: "to be", chinese: "在; 处于", pos: "Verb", day: "Day 2", examples: ["Yo estoy en casa.", "Hoy estoy cansado."] },
+  { spanish: "estudiante", english: "student", chinese: "学生", pos: "Noun", day: "Day 2", examples: ["Yo soy un estudiante de español.", "Ella es estudiante también."] },
+  { spanish: "hoy", english: "today", chinese: "今天", pos: "Adverb", day: "Day 2", examples: ["Hoy estoy cansado.", "Hoy estudio español."] },
+  { spanish: "cansado", english: "tired", chinese: "累的", pos: "Adjective", day: "Day 2", examples: ["Hoy estoy cansado.", "Después del trabajo estoy cansado."] },
+  { spanish: "ocupado", english: "busy", chinese: "忙的", pos: "Adjective", day: "Day 2", examples: ["Hoy estoy ocupado.", "Mi padre está ocupado hoy."] },
+  { spanish: "contento", english: "happy", chinese: "开心的", pos: "Adjective", day: "Day 2", examples: ["Hoy estoy contento.", "Mi hermana está contenta."] },
+  { spanish: "ir", english: "to go", chinese: "去", pos: "Verb", day: "Day 3", examples: ["Yo voy a casa.", "Nosotros vamos a la escuela."] },
+  { spanish: "tener", english: "to have", chinese: "有", pos: "Verb", day: "Day 3", examples: ["Yo tengo trabajo.", "Nosotros tenemos clase hoy."] },
+  { spanish: "hacer", english: "to do / to make", chinese: "做; 制作", pos: "Verb", day: "Day 3", examples: ["Yo hago la comida en casa.", "Nosotros hacemos la tarea."] },
+  { spanish: "querer", english: "to want", chinese: "想要", pos: "Verb", day: "Day 3", examples: ["Yo quiero pizza.", "Quiero estudiar más."] },
+  { spanish: "tranquilo", english: "calm", chinese: "平静的", pos: "Adjective", day: "Day 3", examples: ["Hoy estoy tranquilo.", "Mi hermano está tranquilo."] },
+  { spanish: "nervioso", english: "nervous", chinese: "紧张的", pos: "Adjective", day: "Day 3", examples: ["Hoy estoy nervioso.", "Estoy nervioso antes de hablar."] },
+  { spanish: "orgulloso", english: "proud", chinese: "自豪的", pos: "Adjective", day: "Day 3", examples: ["Hoy estoy orgulloso.", "Mi familia está orgullosa."] },
+  { spanish: "¿Qué?", english: "What?", chinese: "什么?", pos: "Question", day: "Day 4", examples: ["¿Qué quieres comer hoy?", "¿Qué haces en casa?"] },
+  { spanish: "¿Dónde?", english: "Where?", chinese: "哪里?", pos: "Question", day: "Day 4", examples: ["¿Dónde vas hoy?", "¿Dónde está la escuela?"] },
+  { spanish: "¿Cuándo?", english: "When?", chinese: "什么时候?", pos: "Question", day: "Day 4", examples: ["¿Cuándo vas a la escuela?", "¿Cuándo estudias español?"] },
+  { spanish: "¿Cómo?", english: "How?", chinese: "怎么样?; 如何?", pos: "Question", day: "Day 4", examples: ["¿Cómo estás hoy?", "¿Cómo se llama tu madre?"] },
+  { spanish: "¿Quién?", english: "Who?", chinese: "谁?", pos: "Question", day: "Day 4", examples: ["¿Quién es tu profesor?", "¿Quién cocina hoy?"] },
+  { spanish: "me llamo", english: "my name is", chinese: "我叫", pos: "Phrase", day: "Day 5", examples: ["Me llamo Wen.", "Hola, me llamo Ana."] },
+  { spanish: "mi madre", english: "my mother", chinese: "我的妈妈", pos: "Noun", day: "Day 5", examples: ["Mi madre se llama Laura.", "Mi madre vive en China."] },
+  { spanish: "mi padre", english: "my father", chinese: "我的爸爸", pos: "Noun", day: "Day 5", examples: ["Mi padre se llama Paul.", "Mi padre trabaja mucho."] },
+  { spanish: "mi hermano", english: "my brother", chinese: "我的兄弟", pos: "Noun", day: "Day 5", examples: ["Mi hermano se llama Wen.", "Mi hermano está tranquilo."] },
+  { spanish: "mi hermana", english: "my sister", chinese: "我的姐妹", pos: "Noun", day: "Day 5", examples: ["Mi hermana se llama Jade.", "Mi hermana está contenta."] },
+  { spanish: "tengo", english: "I have", chinese: "我有", pos: "Verb", day: "Day 5", examples: ["Tengo dos hermanos.", "Tengo clase hoy."] },
+  { spanish: "mi familia", english: "my family", chinese: "我的家人", pos: "Noun", day: "Day 5", examples: ["Mi familia vive en China.", "Mi familia es importante para mí."] },
+  { spanish: "ayer", english: "yesterday", chinese: "昨天", pos: "Adverb", day: "Day 5", examples: ["Ayer fui a la escuela.", "Ayer trabajé en casa."] },
+  { spanish: "fui", english: "I went (ir past)", chinese: "我去了", pos: "Verb", day: "Day 5", examples: ["Ayer fui a la escuela.", "Ayer fui a casa temprano."] },
+  { spanish: "tuve", english: "I had (tener past)", chinese: "我有过; 我曾有", pos: "Verb", day: "Day 5", examples: ["Ayer tuve trabajo.", "Ayer tuve una clase corta."] },
+  { spanish: "hice", english: "I did/made (hacer past)", chinese: "我做了", pos: "Verb", day: "Day 5", examples: ["Ayer hice la comida en casa.", "Ayer hice la tarea."] },
+  { spanish: "quise", english: "I wanted (querer past)", chinese: "我想要过", pos: "Verb", day: "Day 5", examples: ["Ayer quise pizza.", "Ayer quise estudiar más."] },
+  { spanish: "estudié", english: "I studied (estudiar past)", chinese: "我学习了", pos: "Verb", day: "Day 5", examples: ["Ayer estudié español en casa.", "Ayer estudié un poco más."] },
+  { spanish: "trabajé", english: "I worked (trabajar past)", chinese: "我工作了", pos: "Verb", day: "Day 5", examples: ["Ayer trabajé.", "Ayer trabajé en casa."] },
+  { spanish: "cociné", english: "I cooked (cocinar past)", chinese: "我做饭了", pos: "Verb", day: "Day 5", examples: ["Ayer cociné la comida.", "Ayer cociné arroz."] },
+  { spanish: "hablé", english: "I spoke (hablar past)", chinese: "我说了", pos: "Verb", day: "Day 5", examples: ["Ayer hablé español.", "Ayer hablé con mi familia."] },
+  { spanish: "porque", english: "because", chinese: "因为", pos: "Conjunction", day: "Day 5", examples: ["Estoy contento porque estudio español.", "Voy a casa porque estoy cansado."] },
+  { spanish: "pero", english: "but", chinese: "但是", pos: "Conjunction", day: "Day 5", examples: ["Quise pizza, pero hice arroz.", "Estoy cansado, pero contento."] },
+  { spanish: "después", english: "after; afterward", chinese: "之后", pos: "Adverb", day: "Day 5", examples: ["Después estudié un poco más.", "Después fui a casa."] },
+  { spanish: "un poco más", english: "a little more", chinese: "再多一点", pos: "Phrase", day: "Day 5", examples: ["Después estudié un poco más.", "Quiero practicar un poco más."] },
+  { spanish: "también", english: "also", chinese: "也", pos: "Adverb", day: "Day 5", examples: ["También hablé con mi familia.", "También quiero estudiar hoy."] },
+  { spanish: "arroz", english: "rice", chinese: "米饭", pos: "Noun", day: "Day 5", examples: ["Hice arroz en casa.", "Hoy como arroz también."] },
+  { spanish: "más", english: "more", chinese: "更; 更多", pos: "Adverb", day: "Day 5", examples: ["Quiero estudiar más.", "Hoy practico más español."] },
+  { spanish: "corta", english: "short", chinese: "短的", pos: "Adjective", day: "Day 5", examples: ["Es una historia corta.", "La clase fue corta."] },
+  { spanish: "sobre", english: "about", chinese: "关于", pos: "Preposition", day: "Day 5", examples: ["Escribo una historia sobre mi familia.", "Hablo sobre mi trabajo."] }
+].map((item) => ({ ...item, topic: inferTopic(item) }));
 
 const noteDays = [
   {
@@ -303,6 +462,11 @@ const quizQuestions = [
 
 let currentStory = 0;
 let currentEssay = 0;
+let activeTopicFilter = "All";
+let currentRecordingTarget = pronunciationSections[0].items[0];
+let mediaRecorder;
+let recordingChunks = [];
+let recordingStream;
 
 const essayPrompts = [
   {
@@ -310,6 +474,12 @@ const essayPrompts = [
     hints: ["Use: me llamo", "Use: vivo en ...", "Use: hoy estoy ..."],
     sample: "Me llamo Wen. Vivo en Florida. Hoy estoy contento y tranquilo.",
     explanation: "This practices self-introduction, present tense, and estar with feelings."
+  },
+  {
+    prompt: "Write 4 short Spanish sentences about your daily routine: say what you do in the morning, where you work or study, what you eat, and how you feel at the end of the day.",
+    hints: ["Use: por la mañana ...", "Try: estudio, trabajo, como, cocino", "End with: por la noche estoy ..."],
+    sample: "Por la mañana estudio español. Después trabajo en casa. Como arroz y a veces cocino la comida. Por la noche estoy cansado pero contento.",
+    explanation: "This practices daily routine verbs and simple time expressions."
   },
   {
     prompt: "Write 3 short Spanish sentences about your family: say who is in your family and give one person's name.",
@@ -330,6 +500,91 @@ function activateTab(tabName) {
   panels.forEach((panel) => panel.classList.toggle("active", panel.id === tabName));
 }
 
+function renderRandomBanner() {
+  const palettes = [
+    ["#f97316", "#fb7185", "#38bdf8", "#22c55e"],
+    ["#0f766e", "#14b8a6", "#f59e0b", "#f43f5e"],
+    ["#1d4ed8", "#60a5fa", "#fbbf24", "#f97316"],
+    ["#7c3aed", "#22d3ee", "#a3e635", "#f43f5e"]
+  ];
+  const palette = palettes[Math.floor(Math.random() * palettes.length)];
+  const circles = Array.from({ length: 8 }, (_, index) => {
+    const cx = 80 + index * 120 + Math.floor(Math.random() * 50);
+    const cy = 55 + Math.floor(Math.random() * 90);
+    const radius = 26 + Math.floor(Math.random() * 42);
+    const color = palette[index % palette.length];
+    const opacity = (0.2 + Math.random() * 0.45).toFixed(2);
+    return `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${color}" opacity="${opacity}"></circle>`;
+  }).join("");
+  const waves = palette.map((color, index) => {
+    const y = 34 + index * 30 + Math.floor(Math.random() * 8);
+    return `<path d="M0 ${y} C 140 ${y - 22}, 260 ${y + 26}, 400 ${y} S 660 ${y - 24}, 820 ${y} S 1080 ${y + 18}, 1280 ${y}" stroke="${color}" stroke-width="${10 + index * 3}" fill="none" opacity="0.35" stroke-linecap="round"></path>`;
+  }).join("");
+
+  randomBanner.innerHTML = `
+    <svg viewBox="0 0 1280 256" preserveAspectRatio="none" class="banner-svg" role="img" aria-hidden="true">
+      <defs>
+        <linearGradient id="banner-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f8fbff"></stop>
+          <stop offset="50%" stop-color="#eef5ff"></stop>
+          <stop offset="100%" stop-color="#f7fffb"></stop>
+        </linearGradient>
+      </defs>
+      <rect width="1280" height="256" rx="34" fill="url(#banner-bg)"></rect>
+      ${circles}
+      ${waves}
+      <rect x="74" y="74" width="510" height="110" rx="30" fill="rgba(255, 255, 255, 0.52)"></rect>
+      <text x="108" y="146" fill="#10203f" font-size="70" font-weight="800" font-family="Avenir Next, Segoe UI, sans-serif" letter-spacing="-2">
+        Spanish Learning
+      </text>
+    </svg>
+  `;
+}
+
+function inferTopic(item) {
+  const value = `${item.spanish} ${item.english} ${item.pos} ${item.examples.join(" ")}`.toLowerCase();
+  if (item.pos === "Question" || value.includes("¿")) {
+    return "Questions";
+  }
+  if (["cansado", "ocupado", "contento", "tranquilo", "nervioso", "orgulloso", "corta"].includes(item.spanish.toLowerCase())) {
+    return "Feelings";
+  }
+  if (["la casa", "la escuela", "la comida", "mi madre", "mi padre", "mi hermano", "mi hermana", "mi familia", "arroz", "vivir"].includes(item.spanish.toLowerCase())) {
+    return "Places";
+  }
+  if (item.pos === "Verb" || item.pos === "Phrase") {
+    return "Verbs";
+  }
+  return "Places";
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function getFilteredVocabulary() {
+  const term = vocabSearch.value.trim().toLowerCase();
+  return vocabulary.filter((item) => {
+    const matchesTerm = [item.spanish, item.english, item.chinese, item.pos, item.day, item.topic, ...item.examples]
+      .some((value) => value.toLowerCase().includes(term));
+    const matchesTopic = activeTopicFilter === "All" || item.topic === activeTopicFilter;
+    return matchesTerm && matchesTopic;
+  });
+}
+
+function renderTopicFilters() {
+  topicFilters.innerHTML = filterOptions.map((option) => `
+    <button class="filter-chip ${option === activeTopicFilter ? "active" : ""}" type="button" data-topic="${option}">
+      ${option}
+    </button>
+  `).join("");
+}
+
 function renderVocabulary(items) {
   vocabList.innerHTML = `
     <div class="vocab-table-wrap">
@@ -339,24 +594,168 @@ function renderVocabulary(items) {
             <th scope="col">Spanish</th>
             <th scope="col">English</th>
             <th scope="col">Chinese</th>
-            <th scope="col">Type</th>
-            <th scope="col">Example</th>
+            <th scope="col">Examples</th>
           </tr>
         </thead>
         <tbody>
           ${items.map((item) => `
             <tr>
-              <td class="vocab-spanish">${item.spanish}</td>
+              <td class="vocab-spanish">
+                <span>${item.spanish}</span>
+                <button class="audio-icon-button" type="button" data-speak="${item.spanish}" aria-label="Play pronunciation for ${item.spanish}">
+                  <span aria-hidden="true">🔊</span>
+                </button>
+              </td>
               <td>${item.english}</td>
               <td>${item.chinese}</td>
-              <td class="vocab-pos">${item.pos}</td>
-              <td>${item.example}</td>
+              <td>
+                <ul class="table-example-list">
+                  ${item.examples.map((example) => `
+                    <li class="example-row">
+                      <span>${example}</span>
+                      <button class="audio-icon-button audio-inline-button" type="button" data-speak="${example}" aria-label="Play pronunciation for ${example}">
+                        <span aria-hidden="true">🔊</span>
+                      </button>
+                    </li>
+                  `).join("")}
+                </ul>
+              </td>
             </tr>
           `).join("")}
         </tbody>
       </table>
     </div>
   `;
+}
+
+function renderGrammar() {
+  grammarList.innerHTML = grammarPoints.map((point) => `
+    <article class="grammar-card">
+      <div class="grammar-heading">
+        <p class="grammar-kicker">Grammar Point</p>
+        <h3>${point.title}</h3>
+        <p class="grammar-rule">${point.rule}</p>
+      </div>
+      <div class="grammar-body">
+        <div class="grammar-notes">
+          <p class="grammar-subtitle">Key Notes</p>
+          <ul class="note-list">
+            ${point.details.map((detail) => `<li>${detail}</li>`).join("")}
+          </ul>
+          <p class="grammar-subtitle">Examples</p>
+          <ul class="note-list">
+            ${point.examples.map((example) => `<li>${example}</li>`).join("")}
+          </ul>
+        </div>
+        ${point.table ? `
+          <div class="grammar-table-wrap">
+            <table class="grammar-table">
+              <thead>
+                <tr>${point.table.headers.map((header) => `<th scope="col">${header}</th>`).join("")}</tr>
+              </thead>
+              <tbody>
+                ${point.table.rows.map((row) => `
+                  <tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join("")}</tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+        ` : ""}
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderFlashcards(items) {
+  flashcardList.innerHTML = items.map((item) => `
+    <button class="flashcard" type="button" aria-label="Show English translation for ${item.spanish}" aria-pressed="false">
+      <span class="flashcard-label">Spanish</span>
+      <span class="flashcard-front">${item.spanish}</span>
+      <span class="flashcard-back hidden">${item.english}</span>
+    </button>
+  `).join("");
+}
+
+function renderPronunciation() {
+  const filteredWords = getFilteredVocabulary().slice(0, 12).map((item) => item.spanish);
+  const sections = [
+    {
+      title: "Filtered Words",
+      items: filteredWords.length ? filteredWords : [currentRecordingTarget]
+    },
+    pronunciationSections[1]
+  ];
+
+  pronunciationList.innerHTML = sections.map((section) => `
+    <article class="pronunciation-card">
+      <h3>${section.title}</h3>
+      <div class="pronunciation-items">
+        ${section.items.map((item) => `
+          <button class="pronunciation-button" type="button" data-speak="${item}" aria-label="Play pronunciation for ${item}">
+            <span class="pronunciation-text">${item}</span>
+            <span class="pronunciation-play">Play</span>
+          </button>
+        `).join("")}
+      </div>
+    </article>
+  `).join("");
+}
+
+function speakSpanish(text) {
+  if (!("speechSynthesis" in window)) {
+    window.alert("Audio is not supported in this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "es-ES";
+  utterance.rate = 0.92;
+  window.speechSynthesis.speak(utterance);
+}
+
+function setRecordingTarget(text) {
+  currentRecordingTarget = text;
+  recordingTarget.textContent = `Target: ${text}`;
+}
+
+async function startRecording() {
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+    recordingStatus.textContent = "This browser does not support microphone recording.";
+    return;
+  }
+
+  try {
+    recordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    recordingChunks = [];
+    mediaRecorder = new MediaRecorder(recordingStream);
+    mediaRecorder.addEventListener("dataavailable", (event) => {
+      if (event.data.size > 0) {
+        recordingChunks.push(event.data);
+      }
+    });
+    mediaRecorder.addEventListener("stop", () => {
+      const audioBlob = new Blob(recordingChunks, { type: "audio/webm" });
+      recordingPlayback.src = URL.createObjectURL(audioBlob);
+      recordingStatus.innerHTML = "<p><strong>Recording saved.</strong> Replay your recording and compare it with the model.</p><ul class=\"analysis-list\"><li>Match the rhythm and speed.</li><li>Listen for clear vowels.</li><li>Repeat if the ending sounds weak.</li></ul>";
+      if (recordingStream) {
+        recordingStream.getTracks().forEach((track) => track.stop());
+      }
+    });
+    mediaRecorder.start();
+    recordingStatus.textContent = `Recording now: ${currentRecordingTarget}`;
+  } catch (error) {
+    recordingStatus.textContent = "Microphone access was blocked or unavailable.";
+  }
+}
+
+function stopRecording() {
+  if (!mediaRecorder || mediaRecorder.state !== "recording") {
+    recordingStatus.textContent = "Start a recording first.";
+    return;
+  }
+
+  mediaRecorder.stop();
 }
 
 function renderNotes() {
@@ -673,26 +1072,114 @@ function renderEssay(index) {
     <p><strong>What this practices:</strong> ${item.explanation}</p>
   `;
   essayAnswer.classList.add("hidden");
+  writingFeedback.textContent = "Write your paragraph, then use Check Writing for quick suggestions.";
+  writingFeedback.classList.add("muted");
 }
 
-function loadFeedback() {
-  const saved = window.localStorage.getItem("spanish-learning-feedback");
-  if (saved) {
-    feedbackText.value = saved;
-    feedbackStatus.textContent = "Saved feedback loaded from this browser.";
+function buildWritingFeedback(response, promptData) {
+  const text = response.trim().toLowerCase();
+  const suggestions = [];
+
+  if (!text) {
+    return "Write something first, then run Check Writing.";
   }
+
+  if (!/[.!?]/.test(response)) {
+    suggestions.push("Add punctuation so each sentence is clearly separated.");
+  }
+
+  if (promptData.hints.some((hint) => hint.includes("me llamo")) && !text.includes("me llamo")) {
+    suggestions.push("Add `me llamo` for a clearer self-introduction.");
+  }
+
+  if (promptData.hints.some((hint) => hint.includes("vivo en")) && !text.includes("vivo en")) {
+    suggestions.push("Include `vivo en ...` to say where you live.");
+  }
+
+  if (promptData.prompt.toLowerCase().includes("daily routine") && !/(por la mañana|después|por la noche)/.test(text)) {
+    suggestions.push("Add a time phrase such as `por la mañana`, `después`, or `por la noche`.");
+  }
+
+  if (promptData.prompt.toLowerCase().includes("yesterday") && !text.includes("ayer")) {
+    suggestions.push("Use `ayer` to make the past time clear.");
+  }
+
+  if (/soy (cansado|contento|ocupado|tranquilo|nervioso|orgulloso)/.test(text)) {
+    suggestions.push("Use `estar` for temporary feelings: `estoy cansado`, `estoy contento`, and so on.");
+  }
+
+  if (text.includes("es en ") || text.includes("soy en ")) {
+    suggestions.push("For location, use `estar`, not `ser`.");
+  }
+
+  if (response.trim().split(/\s+/).length < 8) {
+    suggestions.push("Write a little more. Add one more short sentence.");
+  }
+
+  if (!suggestions.length) {
+    suggestions.push("Good overall structure. Compare your verb forms and word choice with the model answer for refinement.");
+  }
+
+  return `<p><strong>Quick Suggestions</strong></p><ul class="analysis-list">${suggestions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => activateTab(tab.dataset.tab));
 });
 
-vocabSearch.addEventListener("input", (event) => {
-  const term = event.target.value.trim().toLowerCase();
-  const filtered = vocabulary.filter((item) =>
-    [item.spanish, item.english, item.chinese, item.pos, item.day, item.example].some((value) => value.toLowerCase().includes(term))
-  );
+vocabSearch.addEventListener("input", () => {
+  const filtered = getFilteredVocabulary();
   renderVocabulary(filtered);
+  renderFlashcards(filtered);
+  renderPronunciation();
+});
+
+topicFilters.addEventListener("click", (event) => {
+  const button = event.target.closest(".filter-chip");
+  if (!button) {
+    return;
+  }
+
+  activeTopicFilter = button.dataset.topic;
+  renderTopicFilters();
+  const filtered = getFilteredVocabulary();
+  renderVocabulary(filtered);
+  renderFlashcards(filtered);
+  renderPronunciation();
+});
+
+vocabList.addEventListener("click", (event) => {
+  const button = event.target.closest(".audio-icon-button");
+  if (!button) {
+    return;
+  }
+
+  setRecordingTarget(button.dataset.speak);
+  speakSpanish(button.dataset.speak);
+});
+
+pronunciationList.addEventListener("click", (event) => {
+  const button = event.target.closest(".pronunciation-button");
+  if (!button) {
+    return;
+  }
+
+  setRecordingTarget(button.dataset.speak);
+  speakSpanish(button.dataset.speak);
+});
+
+flashcardList.addEventListener("click", (event) => {
+  const card = event.target.closest(".flashcard");
+  if (!card) {
+    return;
+  }
+
+  const front = card.querySelector(".flashcard-front");
+  const translation = card.querySelector(".flashcard-back");
+  front.classList.toggle("hidden");
+  translation.classList.toggle("hidden");
+  card.classList.toggle("is-open");
+  card.setAttribute("aria-pressed", card.classList.contains("is-open") ? "true" : "false");
 });
 
 checkQuizButton.addEventListener("click", checkQuiz);
@@ -718,26 +1205,27 @@ showEssayAnswerButton.addEventListener("click", () => {
   essayAnswer.classList.remove("hidden");
 });
 
-feedbackForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const value = feedbackText.value.trim();
-  if (!value) {
-    feedbackStatus.textContent = "Please write a comment before saving.";
-    return;
-  }
-  window.localStorage.setItem("spanish-learning-feedback", value);
-  feedbackStatus.textContent = "Feedback saved locally in this browser.";
+checkWritingButton.addEventListener("click", () => {
+  const promptData = essayPrompts[currentEssay];
+  writingFeedback.innerHTML = buildWritingFeedback(essayResponse.value, promptData);
+  writingFeedback.classList.remove("muted");
 });
 
-clearFeedbackButton.addEventListener("click", () => {
-  window.localStorage.removeItem("spanish-learning-feedback");
-  feedbackText.value = "";
-  feedbackStatus.textContent = "Saved feedback cleared.";
+playRecordingTargetButton.addEventListener("click", () => {
+  speakSpanish(currentRecordingTarget);
 });
 
-renderVocabulary(vocabulary);
+startRecordingButton.addEventListener("click", startRecording);
+stopRecordingButton.addEventListener("click", stopRecording);
+
+renderTopicFilters();
+renderRandomBanner();
+renderVocabulary(getFilteredVocabulary());
+renderGrammar();
+setRecordingTarget(currentRecordingTarget);
+renderPronunciation();
+renderFlashcards(getFilteredVocabulary());
 renderNotes();
 renderStories();
 renderQuiz();
 renderEssay(currentEssay);
-loadFeedback();

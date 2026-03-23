@@ -91,6 +91,22 @@ h3 {
   color: var(--muted);
 }
 
+.random-banner {
+  width: 100%;
+  aspect-ratio: 5 / 1;
+  margin-top: 18px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(97, 119, 152, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.banner-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .tab-bar {
   display: flex;
   flex-wrap: wrap;
@@ -171,7 +187,8 @@ ul {
 
 .info-grid,
 .practice-grid,
-.vocab-grid {
+.vocab-grid,
+.pronunciation-grid {
   display: grid;
   gap: 18px;
 }
@@ -222,6 +239,24 @@ textarea {
   padding: 11px 14px;
 }
 
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.filter-chip {
+  background: rgba(97, 119, 152, 0.08);
+  color: var(--ink);
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, #5d7bff, #4f6df5);
+  color: #fff;
+  box-shadow: 0 12px 26px rgba(79, 109, 245, 0.2);
+}
+
 .vocab-table-wrap {
   overflow-x: auto;
   border-radius: 24px;
@@ -232,7 +267,7 @@ textarea {
 .vocab-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
+  min-width: 980px;
 }
 
 .vocab-table th,
@@ -266,14 +301,262 @@ textarea {
 }
 
 .vocab-spanish {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
   color: var(--accent-dark);
 }
 
-.vocab-pos {
-  white-space: nowrap;
+.audio-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(79, 109, 245, 0.1);
   color: var(--accent-dark);
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.audio-icon-button:hover {
+  background: rgba(79, 109, 245, 0.18);
+}
+
+.table-example-list {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.table-example-list li {
+  color: var(--muted);
+}
+
+.table-example-list li + li {
+  margin-top: 8px;
+}
+
+.example-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.audio-inline-button {
+  width: 28px;
+  height: 28px;
+  font-size: 0.82rem;
+  margin-top: -2px;
+}
+
+.flashcard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.pronunciation-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.grammar-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.grammar-card,
+.recording-panel {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 255, 0.94));
+}
+
+.grammar-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.grammar-heading {
+  position: sticky;
+  top: 16px;
+}
+
+.grammar-kicker,
+.grammar-subtitle {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.grammar-card h3 {
+  margin-bottom: 10px;
+  font-size: 1.26rem;
+  color: var(--accent-dark);
+}
+
+.grammar-rule {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.grammar-body {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.95fr) minmax(360px, 1.05fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.grammar-notes {
+  min-width: 0;
+}
+
+.grammar-table-wrap {
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.grammar-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 460px;
+}
+
+.grammar-table th,
+.grammar-table td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(24, 37, 46, 0.08);
+  vertical-align: top;
+}
+
+.grammar-table thead th {
+  background: #f5f8ff;
+  color: var(--accent-dark);
+  font-size: 0.83rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.grammar-table tbody th {
+  color: var(--ink);
+  font-weight: 700;
+  background: rgba(79, 109, 245, 0.03);
+}
+
+.grammar-table tbody tr:last-child th,
+.grammar-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.recording-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.recording-target {
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+
+.recording-audio {
+  width: 100%;
+}
+
+.pronunciation-card {
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 255, 0.94));
+}
+
+.pronunciation-items {
+  display: grid;
+  gap: 12px;
+}
+
+.pronunciation-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(79, 109, 245, 0.08);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.pronunciation-button:hover {
+  background: rgba(79, 109, 245, 0.16);
+}
+
+.pronunciation-text {
+  font-size: 1rem;
   font-weight: 600;
+  text-align: left;
+}
+
+.pronunciation-play {
+  color: var(--accent-dark);
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.flashcard {
+  display: grid;
+  gap: 10px;
+  min-height: 172px;
+  padding: 22px;
+  text-align: left;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.98), rgba(238, 244, 255, 0.94));
+  box-shadow: 0 16px 36px rgba(79, 109, 245, 0.08);
+  color: var(--ink);
+}
+
+.flashcard.is-open {
+  background: linear-gradient(160deg, rgba(79, 109, 245, 0.96), rgba(39, 64, 181, 0.94));
+  color: #fff;
+}
+
+.flashcard-label {
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.flashcard.is-open .flashcard-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.flashcard-front,
+.flashcard-back {
+  font-size: 1.3rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.flashcard-back.hidden {
+  display: none;
 }
 
 .note-card h3 {
@@ -483,11 +766,21 @@ textarea {
 }
 
 .practice-quiz-panel,
-.practice-essay-panel {
+.practice-essay-panel,
+.writing-panel {
   min-height: 100%;
 }
 
 @media (max-width: 720px) {
+  .grammar-card,
+  .grammar-body {
+    grid-template-columns: 1fr;
+  }
+
+  .grammar-heading {
+    position: static;
+  }
+
   .shell {
     width: min(100% - 20px, 1120px);
     padding-top: 22px;
