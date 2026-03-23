@@ -11,39 +11,41 @@
     <section class="hero">
       <p class="eyebrow">Spanish-learning</p>
       <h1>Spanish Learning</h1>
-      <p class="hero-copy">A focused study site built from your first four days of Spanish notes, now expanded with audio review, difficult-word tracking, writing practice, translation support, and clearer quiz explanations when an answer is wrong.</p>
+      <p class="hero-copy">A focused study site built from your first five days of Spanish notes, with vocabulary review, daily lesson summaries, and short practice drills.</p>
     </section>
 
     <nav class="tab-bar" aria-label="Main tabs">
       <button class="tab-button active" type="button" data-tab="readme">Read Me</button>
       <button class="tab-button" type="button" data-tab="vocabulary">Vocabulary</button>
       <button class="tab-button" type="button" data-tab="notes">Daily Notes</button>
+      <button class="tab-button" type="button" data-tab="stories">Stories</button>
       <button class="tab-button" type="button" data-tab="practice">Practice</button>
       <button class="tab-button" type="button" data-tab="feedback">Feedback</button>
-      <button class="tab-button" type="button" data-tab="translate">Translate</button>
     </nav>
 
     <section id="readme" class="tab-panel active">
       <article class="card">
         <h2>Read Me</h2>
-        <p>This website is a personal Spanish study dashboard based on your first four days of notes. It keeps the early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, and short practice tasks without searching across separate files. The Vocabulary tab now includes topic filters, pronunciation buttons, and a way to mark difficult words for spaced review. The Daily Notes tab keeps each day’s key ideas organized. The Practice tab now includes flashcards, a daily mini quiz with score tracking, explanations for wrong answers, and a difficult-word review mode. The Feedback tab stores your comments locally in the browser. The Translate tab helps you turn a short English paragraph into basic Spanish using patterns from your current lessons.</p>
+        <p>This website is a personal Spanish study dashboard based on your first five days of notes. It is designed to keep the early learning material in one place so you can review verbs, vocabulary, sentence patterns, and question forms without searching across separate files. The Vocabulary tab groups useful words and model phrases from the lessons. The Daily Notes tab keeps each day's learning points organized, including regular verbs, <em>ser</em> and <em>estar</em>, key verbs such as <em>ir</em>, <em>tener</em>, <em>hacer</em>, and <em>querer</em>, basic question patterns, family vocabulary, and simple past tense. The Practice tab now focuses on two things: checking mistakes carefully and writing short Spanish responses from English prompts. The Feedback tab lets you write comments locally in the browser so you can keep track of what is clear, what is confusing, and what should be improved in later versions.</p>
         <div class="info-grid">
           <div class="info-panel">
             <h3>Current Sections</h3>
             <ul>
-              <li><strong>Vocabulary</strong>: words, verbs, question forms, topic filters, and pronunciation audio.</li>
-              <li><strong>Daily Notes</strong>: lesson-by-lesson summaries from Days 1 to 4.</li>
-              <li><strong>Practice</strong>: flashcards, daily mini quiz, score history, and difficult-word review.</li>
-              <li><strong>Feedback</strong>: local notes about progress, errors, and ideas.</li>
-              <li><strong>Translate</strong>: simple English to Spanish paragraph help based on your current study level.</li>
+              <li><strong>Vocabulary</strong>: words, verbs, and short example phrases from Days 1 to 5.</li>
+              <li><strong>Daily Notes</strong>: lesson-by-lesson summaries from your study files.</li>
+              <li><strong>Stories</strong>: short reading passages and cartoon scenes using learned vocabulary.</li>
+              <li><strong>Practice</strong>: quiz review with explanations and short English-to-Spanish writing prompts.</li>
+              <li><strong>Feedback</strong>: local notes about problems, ideas, and learning progress.</li>
             </ul>
           </div>
           <div class="info-panel">
-            <h3>Important Note</h3>
+            <h3>Suggested Next Functions</h3>
             <ul>
-              <li>Pronunciation audio uses your browser’s built-in speech voice, so voice quality depends on the Mac and browser.</li>
-              <li>Translation is intentionally simple and matches your current beginner content. It is not a full translator.</li>
-              <li>When a quiz answer is wrong, the site now explains why the correct choice fits the rule.</li>
+              <li>Pronunciation audio for key words and sentences.</li>
+              <li>Spaced-review mode for words marked as difficult.</li>
+              <li>Daily mini quiz score tracking.</li>
+              <li>A writing practice tab for short self-introductions and daily routine paragraphs.</li>
+              <li>Topic filters such as verbs, feelings, places, and questions.</li>
             </ul>
           </div>
         </div>
@@ -55,13 +57,9 @@
         <div class="section-header">
           <div>
             <h2>Vocabulary</h2>
-            <p class="muted">Core words and phrases from the first four study days, with topic filters and audio review.</p>
+            <p class="muted">Core words and example phrases pulled from the first five study days.</p>
           </div>
-          <input id="vocab-search" class="search-input" type="text" placeholder="Search word, meaning, or example">
-        </div>
-        <div class="toolbar">
-          <div id="topic-filters" class="filter-row"></div>
-          <button id="review-difficult" type="button" class="secondary-button">Review Difficult Words</button>
+          <input id="vocab-search" class="search-input" type="text" placeholder="Search Spanish, English, Chinese, type, or example">
         </div>
         <div id="vocab-list" class="vocab-grid"></div>
       </article>
@@ -74,59 +72,73 @@
       </article>
     </section>
 
+    <section id="stories" class="tab-panel">
+      <article class="card">
+        <div class="section-header">
+          <div>
+            <h2>Stories</h2>
+            <p class="muted">Read a short story built from the vocabulary so far, then review a few cartoon scenes with Spanish and English captions.</p>
+          </div>
+        </div>
+        <div class="illustration-block">
+          <div class="story-topline">
+            <div>
+              <h3>Cartoon Scenes</h3>
+              <p class="muted">Small visual scenes to reinforce names, places, food, and yesterday actions.</p>
+            </div>
+          </div>
+          <div id="story-gallery" class="story-gallery"></div>
+        </div>
+        <div class="story-block">
+          <div class="story-topline">
+            <div>
+              <h3>Mini Story</h3>
+              <p class="muted">Use the button to get another short story with familiar vocabulary.</p>
+            </div>
+            <button id="next-story" type="button">Random Story</button>
+          </div>
+          <div id="story-list" class="story-list"></div>
+        </div>
+      </article>
+    </section>
+
     <section id="practice" class="tab-panel">
       <article class="card">
         <div class="section-header">
           <div>
             <h2>Practice</h2>
-            <p class="muted">Use difficult-word review, a daily mini quiz with explanations, and guided writing from an English sample.</p>
+            <p class="muted">Review mistakes, understand why they happened, and write short Spanish answers from English prompts.</p>
           </div>
         </div>
 
         <div class="practice-grid">
-          <section class="practice-panel">
-            <h3>Difficult Word Review</h3>
-            <div id="difficult-review" class="result-box muted">Mark words as difficult in Vocabulary. They will appear here for spaced review.</div>
-          </section>
-        </div>
-
-        <div class="practice-grid practice-grid-bottom">
-          <section class="practice-panel">
-            <div class="section-header compact-header">
-              <div>
-                <h3>Daily Mini Quiz</h3>
-                <p class="muted">One score is tracked per day in this browser.</p>
-              </div>
-              <button id="reset-quiz" type="button" class="secondary-button">Reset Quiz</button>
-            </div>
+          <section class="practice-panel practice-quiz-panel">
+            <h3>Quick Review</h3>
             <div id="quiz-list" class="quiz-list"></div>
-            <div class="button-row">
-              <button id="check-quiz" type="button">Check Answers</button>
-            </div>
-            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score.</div>
-            <div id="quiz-history" class="result-box muted">No quiz score saved for today.</div>
+            <button id="check-quiz" type="button">Check Answers</button>
+            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score. Wrong answers will show the correct answer and a short explanation.</div>
           </section>
 
-          <section class="practice-panel">
-            <h3>Writing Practice</h3>
-            <div class="prompt-box">
-              <p><strong>English paragraph</strong></p>
-              <p id="writing-prompt-text">Loading writing prompt...</p>
-              <div class="button-row">
-                <button id="next-writing-prompt" type="button" class="secondary-button">Next Paragraph</button>
-                <button id="show-writing-model" type="button" class="secondary-button">Show Model Answer</button>
+          <section class="practice-panel practice-essay-panel">
+            <div class="practice-topline">
+              <div>
+                <h3>Short Essay Practice</h3>
+                <p class="muted">Read the English prompt, write your Spanish version, then compare it with the model answer.</p>
               </div>
-              <p id="writing-model" class="hidden"></p>
+              <button id="next-essay" type="button">Next Prompt</button>
             </div>
-            <form id="writing-form" class="feedback-form">
-              <label for="writing-text">Write the English sample in Spanish</label>
-              <textarea id="writing-text" rows="8" placeholder="Read the English sample above, then write it in Spanish here."></textarea>
+            <div class="essay-box">
+              <p class="card-label">English Prompt</p>
+              <p id="essay-prompt" class="essay-prompt"></p>
+              <p class="card-label">Helpful Hints</p>
+              <ul id="essay-hints" class="note-list"></ul>
+              <label for="essay-response" class="essay-label">Your Spanish</label>
+              <textarea id="essay-response" rows="7" placeholder="Write your Spanish paragraph here."></textarea>
               <div class="button-row">
-                <button type="submit">Check My Spanish</button>
-                <button id="clear-writing" type="button" class="secondary-button">Clear</button>
+                <button id="show-essay-answer" type="button" class="secondary-button">Show Model Answer</button>
               </div>
-            </form>
-            <div id="writing-feedback" class="result-box muted">Write the paragraph in Spanish. The site will compare it with a model answer and explain mistakes in English.</div>
+              <div id="essay-answer" class="result-box hidden"></div>
+            </div>
           </section>
         </div>
       </article>
@@ -145,22 +157,6 @@
           </div>
         </form>
         <div id="feedback-status" class="result-box muted">No saved feedback yet.</div>
-      </article>
-    </section>
-
-    <section id="translate" class="tab-panel">
-      <article class="card">
-        <h2>Translate</h2>
-        <p class="muted">Translate a short English paragraph into beginner Spanish using the verbs and patterns already studied. This tool is intentionally simple and works best with basic sentences.</p>
-        <form id="translate-form" class="feedback-form">
-          <label for="translate-input">English paragraph</label>
-          <textarea id="translate-input" rows="8" placeholder="Example: I am from Florida. Today I am at home. I study Spanish and I want pizza."></textarea>
-          <div class="button-row">
-            <button type="submit">Translate Paragraph</button>
-            <button id="speak-translation" type="button" class="secondary-button">Pronounce Translation</button>
-          </div>
-        </form>
-        <div id="translate-output" class="result-box muted">Translation will appear here.</div>
       </article>
     </section>
   </main>

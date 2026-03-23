@@ -1,22 +1,27 @@
 # Spanish-learning
 
-This website is a personal Spanish study dashboard based on the first four days of notes in `~/Spanish`. It includes six main tabs:
+This website is a personal Spanish study dashboard based on the first five days of notes in `~/Spanish`. It includes five tabs:
 
 - `Read Me`: introduction to the website and suggested next functions
-- `Vocabulary`: useful words, verbs, example sentences, topic filters, audio, and difficult-word review
-- `Daily Notes`: lesson-by-lesson summaries from Days 1 to 4
-- `Practice`: flashcards, daily mini quiz, score tracking, explanations for wrong answers, and writing practice
+- `Vocabulary`: useful words, verbs, and example sentences
+- `Daily Notes`: lesson-by-lesson summaries from Days 1 to 5
+- `Practice`: flashcards and quick review questions
 - `Feedback`: local browser comments for progress tracking
-- `Translate`: simple English to Spanish paragraph help based on current lesson content
 
-## Added Functions
+## Day 5 Content Added
 
-- Pronunciation audio for key words and sentences
-- Spaced review mode for words marked as difficult
-- Daily mini quiz score tracking
-- Writing practice for self-introductions and daily routine paragraphs
+- **Vocabulary**: Family relations (madre, padre, hermano, hermana, familia) and simple past tense verbs
+- **Notes**: Family names introduction with "me llamo" and "se llama" expressions, and irregular & regular past tense forms (pretérito)
+- **Flashcards**: 12 flashcards now include family introductions and past tense verb forms
+- **Quiz**: 10 questions now cover family vocabulary and past tense conjugations
+
+## Suggested Next Functions
+
+- Pronunciation audio
+- Spaced review for difficult words
+- Daily score tracking
+- Writing practice prompts
 - Topic filters for verbs, feelings, places, and questions
-- Simple paragraph translation from English to Spanish
 
 ## Files
 
