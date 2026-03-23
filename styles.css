@@ -128,7 +128,11 @@ button {
   font-size: 0.95rem;
   font-family: inherit;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  text-decoration: none;
   transition: transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
 }
 
@@ -379,14 +383,13 @@ textarea {
 
 .grammar-card {
   display: grid;
-  grid-template-columns: minmax(220px, 300px) 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 18px;
   align-items: start;
 }
 
 .grammar-heading {
-  position: sticky;
-  top: 16px;
+  position: static;
 }
 
 .grammar-kicker,
@@ -413,16 +416,34 @@ textarea {
 
 .grammar-body {
   display: grid;
-  grid-template-columns: minmax(260px, 0.95fr) minmax(360px, 1.05fr);
+  grid-template-columns: 1fr;
   gap: 20px;
   align-items: start;
 }
 
 .grammar-notes {
+  display: grid;
+  gap: 16px;
   min-width: 0;
 }
 
+.grammar-list-block {
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.grammar-list-block .note-list {
+  margin-top: 0;
+}
+
+.grammar-table-block {
+  padding-bottom: 18px;
+}
+
 .grammar-table-wrap {
+  margin-top: 8px;
   overflow-x: auto;
   border-radius: 20px;
   border: 1px solid var(--line);

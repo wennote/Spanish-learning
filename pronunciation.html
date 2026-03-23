@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanish Learning - Pronunciation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Spanish-learning</p>
+      <div id="random-banner" class="random-banner" aria-label="Random decorative picture"></div>
+      <p class="hero-copy">Listen, repeat, and compare your pronunciation with short model words and sentences.</p>
+    </section>
+
+    <nav class="tab-bar" aria-label="Main pages">
+      <a class="tab-button" href="index.html">Read Me</a>
+      <a class="tab-button" href="vocabulary.html">Vocabulary</a>
+      <a class="tab-button" href="grammar.html">Grammar</a>
+      <a class="tab-button active" href="pronunciation.html">Pronunciation</a>
+      <a class="tab-button" href="flashcards.html">Flashcards</a>
+      <a class="tab-button" href="notes.html">Daily Notes</a>
+      <a class="tab-button" href="stories.html">Stories</a>
+      <a class="tab-button" href="practice.html">Practice</a>
+      <a class="tab-button" href="writing.html">Writing</a>
+    </nav>
+
+    <section class="tab-panel active">
+      <article class="card">
+        <div class="section-header">
+          <div>
+            <h2>Pronunciation</h2>
+            <p class="muted">Play key words and complete model sentences. Use the slower pace to repeat after each line.</p>
+          </div>
+        </div>
+        <section class="recording-panel">
+          <div>
+            <p class="card-label">Pronunciation Compare</p>
+            <p id="recording-target" class="recording-target">Select any word or sentence below. Then play the model, record your voice, and replay your version.</p>
+          </div>
+          <div class="button-row">
+            <button id="play-recording-target" type="button">Play Model</button>
+            <button id="start-recording" type="button" class="secondary-button">Start Recording</button>
+            <button id="stop-recording" type="button" class="secondary-button">Stop Recording</button>
+          </div>
+          <audio id="recording-playback" class="recording-audio" controls></audio>
+          <div id="recording-status" class="result-box muted">Microphone recording is ready when your browser allows microphone access.</div>
+        </section>
+        <div id="pronunciation-list" class="pronunciation-grid"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanish Learning - Practice</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Spanish-learning</p>
+      <div id="random-banner" class="random-banner" aria-label="Random decorative picture"></div>
+      <p class="hero-copy">Use quiz review to check what you remember before moving into longer writing practice.</p>
+    </section>
+
+    <nav class="tab-bar" aria-label="Main pages">
+      <a class="tab-button" href="index.html">Read Me</a>
+      <a class="tab-button" href="vocabulary.html">Vocabulary</a>
+      <a class="tab-button" href="grammar.html">Grammar</a>
+      <a class="tab-button" href="pronunciation.html">Pronunciation</a>
+      <a class="tab-button" href="flashcards.html">Flashcards</a>
+      <a class="tab-button" href="notes.html">Daily Notes</a>
+      <a class="tab-button" href="stories.html">Stories</a>
+      <a class="tab-button active" href="practice.html">Practice</a>
+      <a class="tab-button" href="writing.html">Writing</a>
+    </nav>
+
+    <section class="tab-panel active">
+      <article class="card">
+        <div class="section-header">
+          <div>
+            <h2>Practice</h2>
+            <p class="muted">Review mistakes, understand why they happened, and prepare for writing practice.</p>
+          </div>
+        </div>
+        <div class="practice-grid">
+          <section class="practice-panel practice-quiz-panel">
+            <h3>Quick Review</h3>
+            <div id="quiz-list" class="quiz-list"></div>
+            <button id="check-quiz" type="button">Check Answers</button>
+            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score. Wrong answers will show the correct answer and a short explanation.</div>
+          </section>
+
+          <section class="practice-panel practice-essay-panel">
+            <h3>Practice Focus</h3>
+            <p class="muted">Use this page for quiz review. The Writing page holds the longer paragraph practice tasks.</p>
+            <div class="result-box">
+              <p><strong>Recommended order:</strong> 1. Check quiz mistakes. 2. Open Writing. 3. Draft your paragraph. 4. Compare with the model answer.</p>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

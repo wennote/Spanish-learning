@@ -11,26 +11,26 @@
     <section class="hero">
       <p class="eyebrow">Spanish-learning</p>
       <div id="random-banner" class="random-banner" aria-label="Random decorative picture"></div>
-      
       <p class="hero-copy">A focused study site built from your first five days of Spanish notes, with vocabulary review, daily lesson summaries, and short practice drills.</p>
     </section>
 
-    <nav class="tab-bar" aria-label="Main tabs">
-      <button class="tab-button active" type="button" data-tab="readme">Read Me</button>
-      <button class="tab-button" type="button" data-tab="vocabulary">Vocabulary</button>
-      <button class="tab-button" type="button" data-tab="grammar">Grammar</button>
-      <button class="tab-button" type="button" data-tab="pronunciation">Pronunciation</button>
-      <button class="tab-button" type="button" data-tab="flashcards">Flashcards</button>
-      <button class="tab-button" type="button" data-tab="notes">Daily Notes</button>
-      <button class="tab-button" type="button" data-tab="stories">Stories</button>
-      <button class="tab-button" type="button" data-tab="practice">Practice</button>
-      <button class="tab-button" type="button" data-tab="writing">Writing</button>
+    <nav class="tab-bar" aria-label="Main pages">
+      <a class="tab-button active" href="index.html">Read Me</a>
+      <a class="tab-button" href="vocabulary.html">Vocabulary</a>
+      <a class="tab-button" href="grammar.html">Grammar</a>
+      <a class="tab-button" href="pronunciation.html">Pronunciation</a>
+      <a class="tab-button" href="flashcards.html">Flashcards</a>
+      <a class="tab-button" href="notes.html">Daily Notes</a>
+      <a class="tab-button" href="stories.html">Stories</a>
+      <a class="tab-button" href="practice.html">Practice</a>
+      <a class="tab-button" href="writing.html">Writing</a>
     </nav>
 
-    <section id="readme" class="tab-panel active">
+    <section class="tab-panel active">
       <article class="card">
         <h2>Read Me</h2>
-        <p>This website is a personal Spanish study dashboard based on your first five days of notes. It is designed to keep the early learning material in one place so you can review verbs, vocabulary, sentence patterns, and question forms without searching across separate files. The Vocabulary tab groups useful words and model phrases from the lessons. The Grammar tab explains the main grammar points involved. The Pronunciation tab gives quick audio playback for key words and full sentences, plus voice recording for self-comparison. The Daily Notes tab keeps each day's learning points organized, including regular verbs, <em>ser</em> and <em>estar</em>, key verbs such as <em>ir</em>, <em>tener</em>, <em>hacer</em>, and <em>querer</em>, basic question patterns, family vocabulary, and simple past tense. The Practice tab focuses on quiz review, and the Writing tab gives short paragraph practice plus simple correction suggestions for grammar and word choice.</p>
+        <p>This website is a personal Spanish study dashboard based on your first five days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.</p>
+        <p>The overall workflow is simple. Start with <strong>Read Me</strong> for orientation, move to <strong>Vocabulary</strong> for word review, use <strong>Grammar</strong> for reference and verb tables, go to <strong>Pronunciation</strong> to listen and record, use <strong>Flashcards</strong> for quick recall, check <strong>Daily Notes</strong> and <strong>Stories</strong> for context, then finish with <strong>Practice</strong> and <strong>Writing</strong> for active use.</p>
         <div class="info-grid">
           <div class="info-panel">
             <h3>Current Sections</h3>
@@ -45,181 +45,64 @@
             </ul>
           </div>
           <div class="info-panel">
-            <h3>Suggested Next Functions</h3>
+            <h3>How To Use</h3>
             <ul>
-              <li>Spaced-review mode for words marked as difficult.</li>
-              <li>Daily mini quiz score tracking.</li>
-              <li>Conversation drills with answer checking.</li>
-              <li>Progress history for pronunciation recording practice.</li>
-              <li>Expanded writing corrections with tense-level feedback.</li>
+              <li>Use topic filters on Vocabulary to focus on verbs, feelings, places, or questions.</li>
+              <li>Use the speaker icons to hear both the target word and the example sentence.</li>
+              <li>Use Grammar as a reference page when reading or writing, especially for verb endings.</li>
+              <li>Use Pronunciation recording to compare your own voice with the model playback.</li>
+              <li>Use Writing after Practice so you can apply the same grammar and vocabulary actively.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-panel">
+            <h3>What Has Been Customized</h3>
+            <ul>
+              <li>The original single-page tab layout has been split into separate HTML pages for easier review.</li>
+              <li>Vocabulary now includes audio playback, alphabetical sorting, one example sentence audio, and topic filters.</li>
+              <li>Grammar was redesigned to use the page width better and now includes reference tables.</li>
+              <li>Pronunciation includes model playback and browser-based microphone recording.</li>
+              <li>Writing includes prompt rotation, model answers, and quick grammar suggestions.</li>
+            </ul>
+          </div>
+          <div class="info-panel">
+            <h3>Current Limits</h3>
+            <ul>
+              <li>Audio uses the browser speech engine, so voice quality depends on the browser and system.</li>
+              <li>Writing suggestions are rule-based and helpful for common beginner mistakes, but not full grammar correction.</li>
+              <li>Recorded pronunciation is stored only in the current browser session unless exported manually.</li>
+              <li>The site is static HTML, CSS, and JS, so there is no server-side storage or user account system.</li>
+              <li>Vocabulary and grammar content are still focused on the first five study days, not a full course.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-panel">
+            <h3>Requested Changes Log</h3>
+            <ul>
+              <li>Added audio support to vocabulary and example playback.</li>
+              <li>Removed the old type column and kept a cleaner vocabulary layout.</li>
+              <li>Added flashcards, pronunciation, writing, grammar, and story/practice refinements.</li>
+              <li>Redesigned the grammar area to use horizontal space better and added verb tables.</li>
+              <li>Split the original single-page tab layout into separate HTML pages for easier review.</li>
+              <li>Added the top banner and adjusted its ratio and title placement based on your requests.</li>
+              <li>Removed the feedback tab and removed the separate changes tab.</li>
+            </ul>
+          </div>
+          <div class="info-panel">
+            <h3>Vocabulary Decisions</h3>
+            <ul>
+              <li>Vocabulary is sorted alphabetically by Spanish word.</li>
+              <li>Each vocabulary row now shows one example sentence instead of two.</li>
+              <li>The main Spanish word and the example sentence both keep their speaker buttons.</li>
+              <li>The word <strong>aprender</strong> was added to the vocabulary list.</li>
+              <li>Topic filters remain available for verbs, feelings, places, and questions.</li>
             </ul>
           </div>
         </div>
       </article>
     </section>
-
-    <section id="vocabulary" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Vocabulary</h2>
-            <p class="muted">Core words and example phrases pulled from the first five study days.</p>
-          </div>
-          <input id="vocab-search" class="search-input" type="text" placeholder="Search Spanish, English, Chinese, or example">
-        </div>
-        <div id="topic-filters" class="filter-bar" aria-label="Topic filters"></div>
-        <div id="vocab-list" class="vocab-grid"></div>
-      </article>
-    </section>
-
-    <section id="grammar" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Grammar</h2>
-            <p class="muted">Short explanations for the main grammar points used in your lessons.</p>
-          </div>
-        </div>
-        <div id="grammar-list" class="grammar-grid"></div>
-      </article>
-    </section>
-
-    <section id="flashcards" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Flashcards</h2>
-            <p class="muted">Click any card to reveal the English translation, then click again to hide it.</p>
-          </div>
-        </div>
-        <div id="flashcard-list" class="flashcard-grid"></div>
-      </article>
-    </section>
-
-    <section id="pronunciation" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Pronunciation</h2>
-            <p class="muted">Play key words and complete model sentences. Use the slower pace to repeat after each line.</p>
-          </div>
-        </div>
-        <section class="recording-panel">
-          <div>
-            <p class="card-label">Pronunciation Compare</p>
-            <p id="recording-target" class="recording-target">Select any word or sentence below. Then play the model, record your voice, and replay your version.</p>
-          </div>
-          <div class="button-row">
-            <button id="play-recording-target" type="button">Play Model</button>
-            <button id="start-recording" type="button" class="secondary-button">Start Recording</button>
-            <button id="stop-recording" type="button" class="secondary-button">Stop Recording</button>
-          </div>
-          <audio id="recording-playback" class="recording-audio" controls></audio>
-          <div id="recording-status" class="result-box muted">Microphone recording is ready when your browser allows microphone access.</div>
-        </section>
-        <div id="pronunciation-list" class="pronunciation-grid"></div>
-      </article>
-    </section>
-
-    <section id="notes" class="tab-panel">
-      <article class="card">
-        <h2>Daily Notes</h2>
-        <div id="notes-list" class="notes-list"></div>
-      </article>
-    </section>
-
-    <section id="stories" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Stories</h2>
-            <p class="muted">Read a short story built from the vocabulary so far, then review a few cartoon scenes with Spanish and English captions.</p>
-          </div>
-        </div>
-        <div class="illustration-block">
-          <div class="story-topline">
-            <div>
-              <h3>Cartoon Scenes</h3>
-              <p class="muted">Small visual scenes to reinforce names, places, food, and yesterday actions.</p>
-            </div>
-          </div>
-          <div id="story-gallery" class="story-gallery"></div>
-        </div>
-        <div class="story-block">
-          <div class="story-topline">
-            <div>
-              <h3>Mini Story</h3>
-              <p class="muted">Use the button to get another short story with familiar vocabulary.</p>
-            </div>
-            <button id="next-story" type="button">Random Story</button>
-          </div>
-          <div id="story-list" class="story-list"></div>
-        </div>
-      </article>
-    </section>
-
-    <section id="practice" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Practice</h2>
-            <p class="muted">Review mistakes, understand why they happened, and write short Spanish answers from English prompts.</p>
-          </div>
-        </div>
-
-        <div class="practice-grid">
-          <section class="practice-panel practice-quiz-panel">
-            <h3>Quick Review</h3>
-            <div id="quiz-list" class="quiz-list"></div>
-            <button id="check-quiz" type="button">Check Answers</button>
-            <div id="quiz-result" class="result-box muted">Choose an answer for each question, then check your score. Wrong answers will show the correct answer and a short explanation.</div>
-          </section>
-
-          <section class="practice-panel practice-essay-panel">
-            <h3>Practice Focus</h3>
-            <p class="muted">Use this tab for quiz review. The new Writing tab now holds the longer paragraph practice tasks.</p>
-            <div class="result-box">
-              <p><strong>Recommended order:</strong> 1. Check quiz mistakes. 2. Open Writing. 3. Draft your paragraph. 4. Compare with the model answer.</p>
-            </div>
-          </section>
-        </div>
-      </article>
-    </section>
-
-    <section id="writing" class="tab-panel">
-      <article class="card">
-        <div class="section-header">
-          <div>
-            <h2>Writing</h2>
-            <p class="muted">Practice short paragraphs for self-introduction, daily routine, and family topics.</p>
-          </div>
-        </div>
-        <section class="practice-panel writing-panel">
-          <div class="practice-topline">
-            <div>
-              <h3>Short Paragraph Practice</h3>
-              <p class="muted">Read the English prompt, write your Spanish version, then compare it with the model answer.</p>
-            </div>
-            <button id="next-essay" type="button">Next Prompt</button>
-          </div>
-          <div class="essay-box">
-            <p class="card-label">English Prompt</p>
-            <p id="essay-prompt" class="essay-prompt"></p>
-            <p class="card-label">Helpful Hints</p>
-            <ul id="essay-hints" class="note-list"></ul>
-            <label for="essay-response" class="essay-label">Your Spanish</label>
-            <textarea id="essay-response" rows="7" placeholder="Write your Spanish paragraph here."></textarea>
-            <div class="button-row">
-              <button id="show-essay-answer" type="button" class="secondary-button">Show Model Answer</button>
-              <button id="check-writing" type="button">Check Writing</button>
-            </div>
-            <div id="essay-answer" class="result-box hidden"></div>
-            <div id="writing-feedback" class="result-box muted">Write your paragraph, then use Check Writing for quick suggestions.</div>
-          </div>
-        </section>
-      </article>
-    </section>
-
   </main>
 
   <script src="app.js"></script>

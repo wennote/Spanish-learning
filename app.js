@@ -1,5 +1,3 @@
-const tabs = document.querySelectorAll(".tab-button");
-const panels = document.querySelectorAll(".tab-panel");
 const randomBanner = document.getElementById("random-banner");
 const vocabList = document.getElementById("vocab-list");
 const vocabSearch = document.getElementById("vocab-search");
@@ -180,6 +178,7 @@ const grammarPoints = [
 const filterOptions = ["All", "Verbs", "Feelings", "Places", "Questions"];
 
 const vocabulary = [
+  { spanish: "aprender", english: "to learn", chinese: "学习; 学会", pos: "Verb", day: "Day 1", examples: ["Quiero aprender español.", "Nosotros aprendemos cada día."] },
   { spanish: "hablar", english: "to speak", chinese: "说", pos: "Verb", day: "Day 1", examples: ["Yo hablo español.", "Nosotros hablamos en clase."] },
   { spanish: "comer", english: "to eat", chinese: "吃", pos: "Verb", day: "Day 1", examples: ["Ellos comen pizza.", "Yo como arroz en casa."] },
   { spanish: "vivir", english: "to live", chinese: "住; 生活", pos: "Verb", day: "Day 1", examples: ["Yo vivo en Florida.", "Mi familia vive en China."] },
@@ -495,12 +494,10 @@ const essayPrompts = [
   }
 ];
 
-function activateTab(tabName) {
-  tabs.forEach((tab) => tab.classList.toggle("active", tab.dataset.tab === tabName));
-  panels.forEach((panel) => panel.classList.toggle("active", panel.id === tabName));
-}
-
 function renderRandomBanner() {
+  if (!randomBanner) {
+    return;
+  }
   const palettes = [
     ["#f97316", "#fb7185", "#38bdf8", "#22c55e"],
     ["#0f766e", "#14b8a6", "#f59e0b", "#f43f5e"],
@@ -568,16 +565,19 @@ function escapeHtml(value) {
 }
 
 function getFilteredVocabulary() {
-  const term = vocabSearch.value.trim().toLowerCase();
+  const term = vocabSearch ? vocabSearch.value.trim().toLowerCase() : "";
   return vocabulary.filter((item) => {
     const matchesTerm = [item.spanish, item.english, item.chinese, item.pos, item.day, item.topic, ...item.examples]
       .some((value) => value.toLowerCase().includes(term));
     const matchesTopic = activeTopicFilter === "All" || item.topic === activeTopicFilter;
     return matchesTerm && matchesTopic;
-  });
+  }).sort((a, b) => a.spanish.localeCompare(b.spanish, "es", { sensitivity: "base" }));
 }
 
 function renderTopicFilters() {
+  if (!topicFilters) {
+    return;
+  }
   topicFilters.innerHTML = filterOptions.map((option) => `
     <button class="filter-chip ${option === activeTopicFilter ? "active" : ""}" type="button" data-topic="${option}">
       ${option}
@@ -586,6 +586,9 @@ function renderTopicFilters() {
 }
 
 function renderVocabulary(items) {
+  if (!vocabList) {
+    return;
+  }
   vocabList.innerHTML = `
     <div class="vocab-table-wrap">
       <table class="vocab-table">
@@ -610,7 +613,7 @@ function renderVocabulary(items) {
               <td>${item.chinese}</td>
               <td>
                 <ul class="table-example-list">
-                  ${item.examples.map((example) => `
+                  ${item.examples.slice(0, 1).map((example) => `
                     <li class="example-row">
                       <span>${example}</span>
                       <button class="audio-icon-button audio-inline-button" type="button" data-speak="${example}" aria-label="Play pronunciation for ${example}">
@@ -629,6 +632,9 @@ function renderVocabulary(items) {
 }
 
 function renderGrammar() {
+  if (!grammarList) {
+    return;
+  }
   grammarList.innerHTML = grammarPoints.map((point) => `
     <article class="grammar-card">
       <div class="grammar-heading">
@@ -638,28 +644,35 @@ function renderGrammar() {
       </div>
       <div class="grammar-body">
         <div class="grammar-notes">
-          <p class="grammar-subtitle">Key Notes</p>
-          <ul class="note-list">
-            ${point.details.map((detail) => `<li>${detail}</li>`).join("")}
-          </ul>
-          <p class="grammar-subtitle">Examples</p>
-          <ul class="note-list">
-            ${point.examples.map((example) => `<li>${example}</li>`).join("")}
-          </ul>
+          <section class="grammar-list-block">
+            <p class="grammar-subtitle">Key Notes</p>
+            <ul class="note-list">
+              ${point.details.map((detail) => `<li>${detail}</li>`).join("")}
+            </ul>
+          </section>
+          <section class="grammar-list-block">
+            <p class="grammar-subtitle">Examples</p>
+            <ul class="note-list">
+              ${point.examples.map((example) => `<li>${example}</li>`).join("")}
+            </ul>
+          </section>
         </div>
         ${point.table ? `
-          <div class="grammar-table-wrap">
-            <table class="grammar-table">
-              <thead>
-                <tr>${point.table.headers.map((header) => `<th scope="col">${header}</th>`).join("")}</tr>
-              </thead>
-              <tbody>
-                ${point.table.rows.map((row) => `
-                  <tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join("")}</tr>
-                `).join("")}
-              </tbody>
-            </table>
-          </div>
+          <section class="grammar-list-block grammar-table-block">
+            <p class="grammar-subtitle">Reference Table</p>
+            <div class="grammar-table-wrap">
+              <table class="grammar-table">
+                <thead>
+                  <tr>${point.table.headers.map((header) => `<th scope="col">${header}</th>`).join("")}</tr>
+                </thead>
+                <tbody>
+                  ${point.table.rows.map((row) => `
+                    <tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join("")}</tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
         ` : ""}
       </div>
     </article>
@@ -667,6 +680,9 @@ function renderGrammar() {
 }
 
 function renderFlashcards(items) {
+  if (!flashcardList) {
+    return;
+  }
   flashcardList.innerHTML = items.map((item) => `
     <button class="flashcard" type="button" aria-label="Show English translation for ${item.spanish}" aria-pressed="false">
       <span class="flashcard-label">Spanish</span>
@@ -677,6 +693,9 @@ function renderFlashcards(items) {
 }
 
 function renderPronunciation() {
+  if (!pronunciationList) {
+    return;
+  }
   const filteredWords = getFilteredVocabulary().slice(0, 12).map((item) => item.spanish);
   const sections = [
     {
@@ -715,6 +734,9 @@ function speakSpanish(text) {
 }
 
 function setRecordingTarget(text) {
+  if (!recordingTarget) {
+    return;
+  }
   currentRecordingTarget = text;
   recordingTarget.textContent = `Target: ${text}`;
 }
@@ -759,6 +781,9 @@ function stopRecording() {
 }
 
 function renderNotes() {
+  if (!notesList) {
+    return;
+  }
   notesList.innerHTML = noteDays.map((day) => `
     <article class="note-card">
       <h3>${day.title}</h3>
@@ -771,6 +796,9 @@ function renderNotes() {
 }
 
 function renderStories(index = currentStory) {
+  if (!storyList || !storyGallery) {
+    return;
+  }
   const story = stories[index];
 
   storyList.innerHTML = `
@@ -1013,6 +1041,9 @@ function storySceneCookingRice() {
 }
 
 function renderQuiz() {
+  if (!quizList) {
+    return;
+  }
   quizList.innerHTML = quizQuestions.map((question, index) => `
     <article class="quiz-card">
       <p><strong>${index + 1}.</strong> ${question.prompt}</p>
@@ -1029,6 +1060,9 @@ function renderQuiz() {
 }
 
 function checkQuiz() {
+  if (!quizList || !quizResult) {
+    return;
+  }
   let score = 0;
   const review = [];
 
@@ -1064,6 +1098,9 @@ function checkQuiz() {
 }
 
 function renderEssay(index) {
+  if (!essayPrompt || !essayHints || !essayAnswer || !writingFeedback) {
+    return;
+  }
   const item = essayPrompts[index];
   essayPrompt.textContent = item.prompt;
   essayHints.innerHTML = item.hints.map((hint) => `<li>${hint}</li>`).join("");
@@ -1123,100 +1160,123 @@ function buildWritingFeedback(response, promptData) {
   return `<p><strong>Quick Suggestions</strong></p><ul class="analysis-list">${suggestions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
 }
 
-tabs.forEach((tab) => {
-  tab.addEventListener("click", () => activateTab(tab.dataset.tab));
-});
+if (vocabSearch) {
+  vocabSearch.addEventListener("input", () => {
+    const filtered = getFilteredVocabulary();
+    renderVocabulary(filtered);
+    renderFlashcards(filtered);
+    renderPronunciation();
+  });
+}
 
-vocabSearch.addEventListener("input", () => {
-  const filtered = getFilteredVocabulary();
-  renderVocabulary(filtered);
-  renderFlashcards(filtered);
-  renderPronunciation();
-});
-
-topicFilters.addEventListener("click", (event) => {
-  const button = event.target.closest(".filter-chip");
-  if (!button) {
-    return;
-  }
-
-  activeTopicFilter = button.dataset.topic;
-  renderTopicFilters();
-  const filtered = getFilteredVocabulary();
-  renderVocabulary(filtered);
-  renderFlashcards(filtered);
-  renderPronunciation();
-});
-
-vocabList.addEventListener("click", (event) => {
-  const button = event.target.closest(".audio-icon-button");
-  if (!button) {
-    return;
-  }
-
-  setRecordingTarget(button.dataset.speak);
-  speakSpanish(button.dataset.speak);
-});
-
-pronunciationList.addEventListener("click", (event) => {
-  const button = event.target.closest(".pronunciation-button");
-  if (!button) {
-    return;
-  }
-
-  setRecordingTarget(button.dataset.speak);
-  speakSpanish(button.dataset.speak);
-});
-
-flashcardList.addEventListener("click", (event) => {
-  const card = event.target.closest(".flashcard");
-  if (!card) {
-    return;
-  }
-
-  const front = card.querySelector(".flashcard-front");
-  const translation = card.querySelector(".flashcard-back");
-  front.classList.toggle("hidden");
-  translation.classList.toggle("hidden");
-  card.classList.toggle("is-open");
-  card.setAttribute("aria-pressed", card.classList.contains("is-open") ? "true" : "false");
-});
-
-checkQuizButton.addEventListener("click", checkQuiz);
-
-nextEssayButton.addEventListener("click", () => {
-  currentEssay = (currentEssay + 1) % essayPrompts.length;
-  essayResponse.value = "";
-  renderEssay(currentEssay);
-});
-
-nextStoryButton.addEventListener("click", () => {
-  let nextIndex = currentStory;
-  if (stories.length > 1) {
-    while (nextIndex === currentStory) {
-      nextIndex = Math.floor(Math.random() * stories.length);
+if (topicFilters) {
+  topicFilters.addEventListener("click", (event) => {
+    const button = event.target.closest(".filter-chip");
+    if (!button) {
+      return;
     }
-  }
-  currentStory = nextIndex;
-  renderStories(currentStory);
-});
 
-showEssayAnswerButton.addEventListener("click", () => {
-  essayAnswer.classList.remove("hidden");
-});
+    activeTopicFilter = button.dataset.topic;
+    renderTopicFilters();
+    const filtered = getFilteredVocabulary();
+    renderVocabulary(filtered);
+    renderFlashcards(filtered);
+    renderPronunciation();
+  });
+}
 
-checkWritingButton.addEventListener("click", () => {
-  const promptData = essayPrompts[currentEssay];
-  writingFeedback.innerHTML = buildWritingFeedback(essayResponse.value, promptData);
-  writingFeedback.classList.remove("muted");
-});
+if (vocabList) {
+  vocabList.addEventListener("click", (event) => {
+    const button = event.target.closest(".audio-icon-button");
+    if (!button) {
+      return;
+    }
 
-playRecordingTargetButton.addEventListener("click", () => {
-  speakSpanish(currentRecordingTarget);
-});
+    setRecordingTarget(button.dataset.speak);
+    speakSpanish(button.dataset.speak);
+  });
+}
 
-startRecordingButton.addEventListener("click", startRecording);
-stopRecordingButton.addEventListener("click", stopRecording);
+if (pronunciationList) {
+  pronunciationList.addEventListener("click", (event) => {
+    const button = event.target.closest(".pronunciation-button");
+    if (!button) {
+      return;
+    }
+
+    setRecordingTarget(button.dataset.speak);
+    speakSpanish(button.dataset.speak);
+  });
+}
+
+if (flashcardList) {
+  flashcardList.addEventListener("click", (event) => {
+    const card = event.target.closest(".flashcard");
+    if (!card) {
+      return;
+    }
+
+    const front = card.querySelector(".flashcard-front");
+    const translation = card.querySelector(".flashcard-back");
+    front.classList.toggle("hidden");
+    translation.classList.toggle("hidden");
+    card.classList.toggle("is-open");
+    card.setAttribute("aria-pressed", card.classList.contains("is-open") ? "true" : "false");
+  });
+}
+
+if (checkQuizButton) {
+  checkQuizButton.addEventListener("click", checkQuiz);
+}
+
+if (nextEssayButton) {
+  nextEssayButton.addEventListener("click", () => {
+    currentEssay = (currentEssay + 1) % essayPrompts.length;
+    essayResponse.value = "";
+    renderEssay(currentEssay);
+  });
+}
+
+if (nextStoryButton) {
+  nextStoryButton.addEventListener("click", () => {
+    let nextIndex = currentStory;
+    if (stories.length > 1) {
+      while (nextIndex === currentStory) {
+        nextIndex = Math.floor(Math.random() * stories.length);
+      }
+    }
+    currentStory = nextIndex;
+    renderStories(currentStory);
+  });
+}
+
+if (showEssayAnswerButton) {
+  showEssayAnswerButton.addEventListener("click", () => {
+    essayAnswer.classList.remove("hidden");
+  });
+}
+
+if (checkWritingButton) {
+  checkWritingButton.addEventListener("click", () => {
+    const promptData = essayPrompts[currentEssay];
+    writingFeedback.innerHTML = buildWritingFeedback(essayResponse.value, promptData);
+    writingFeedback.classList.remove("muted");
+  });
+}
+
+if (playRecordingTargetButton) {
+  playRecordingTargetButton.addEventListener("click", () => {
+    speakSpanish(currentRecordingTarget);
+  });
+}
+
+if (startRecordingButton) {
+  startRecordingButton.addEventListener("click", startRecording);
+}
+
+if (stopRecordingButton) {
+  stopRecordingButton.addEventListener("click", stopRecording);
+}
 
 renderTopicFilters();
 renderRandomBanner();
