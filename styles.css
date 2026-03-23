@@ -42,53 +42,69 @@ body {
 }
 
 .hero {
-  padding: 40px 40px 34px;
+  padding: 46px 48px 42px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.78), rgba(30, 41, 59, 0.68));
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(circle at top right, rgba(84, 212, 181, 0.2), transparent 28%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(242, 246, 255, 0.95)),
-    var(--paper);
+    linear-gradient(135deg, rgba(13, 20, 36, 0.56), rgba(13, 20, 36, 0.36)),
+    url("assets/hero-portrait.png") center/cover no-repeat;
+  filter: saturate(1.02);
+  opacity: 0.92;
+  z-index: 0;
 }
 
 .hero-intro {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 340px);
-  gap: 36px;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 56px;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-text {
   min-width: 0;
   max-width: 560px;
+  position: relative;
+  z-index: 2;
+  margin-right: 0;
 }
 
-.hero-portrait {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.hero-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-content: center;
 }
 
-.portrait-svg {
-  width: min(220px, 100%);
-  height: auto;
-  filter: drop-shadow(0 18px 34px rgba(79, 109, 245, 0.16));
+.hero-kicker {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.88);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .portrait-image {
-  width: min(320px, 100%);
-  max-height: 300px;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   display: block;
-  filter: drop-shadow(0 20px 32px rgba(79, 109, 245, 0.16));
+  position: relative;
+  z-index: 1;
+  clip-path: ellipse(44% 50% at 50% 50%);
+  filter: drop-shadow(0 26px 34px rgba(79, 109, 245, 0.18));
 }
 
-.eyebrow {
-  margin: 0 0 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--accent-dark);
+.portrait-image-uniform {
+  width: 100%;
+  height: 148px;
 }
 
 h1,
@@ -99,9 +115,15 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2.2rem, 4vw, 3.8rem);
+  font-size: clamp(4rem, 7vw, 6.3rem);
   letter-spacing: -0.04em;
-  font-weight: 750;
+  line-height: 0.92;
+  font-weight: 700;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  color: #ffffff;
+  text-wrap: nowrap;
+  text-shadow: 0 14px 30px rgba(15, 23, 42, 0.34);
 }
 
 h2 {
@@ -118,10 +140,16 @@ h3 {
 
 .hero-copy {
   width: min(760px, 100%);
-  margin: 16px 0 0;
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--muted);
+  margin: 18px 0 0;
+  font-size: 0.98rem;
+  line-height: 1.68;
+  color: rgba(255, 255, 255, 0.94);
+  max-width: 25rem;
+  padding: 16px 20px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.16);
 }
 
 .tab-bar {
@@ -199,16 +227,35 @@ button:hover,
 @media (max-width: 760px) {
   .hero-intro {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 22px;
   }
 
-  .hero-portrait {
-    justify-content: flex-start;
+  .hero-gallery {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
   }
 
-  .portrait-image {
-    width: min(260px, 100%);
-    max-height: 240px;
+  .hero {
+    padding: 30px 24px 28px;
+  }
+
+  .hero-text {
+    margin-right: 0;
+    max-width: 100%;
+  }
+
+  h1 {
+    text-wrap: balance;
+    font-size: clamp(3.2rem, 12vw, 4.8rem);
+  }
+
+  .hero-copy {
+    max-width: 100%;
+    padding: 16px 18px;
+  }
+
+  .portrait-image-uniform {
+    height: 132px;
   }
 }
 
