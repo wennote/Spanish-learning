@@ -550,10 +550,6 @@ function renderRandomBanner() {
       <rect width="1280" height="256" rx="34" fill="url(#banner-bg)"></rect>
       ${circles}
       ${waves}
-      <rect x="74" y="74" width="510" height="110" rx="30" fill="rgba(255, 255, 255, 0.52)"></rect>
-      <text x="108" y="146" fill="#10203f" font-size="70" font-weight="800" font-family="Avenir Next, Segoe UI, sans-serif" letter-spacing="-2">
-        Spanish Learning
-      </text>
     </svg>
   `;
 }
