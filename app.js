@@ -34,7 +34,22 @@ const recordingPlayback = document.getElementById("recording-playback");
 
 const STORAGE_KEYS = {
   studySelections: "spanish-learning-selections",
-  quizHistory: "spanish-learning-quiz-history"
+  quizHistory: "spanish-learning-quiz-history",
+  language: "spanish-learning-language"
+};
+
+const NAV_LABELS = {
+  "index.html": { en: "Read Me", zh: "说明" },
+  "vocabulary.html": { en: "Vocabulary", zh: "词汇" },
+  "grammar.html": { en: "Grammar", zh: "语法" },
+  "pronunciation.html": { en: "Pronunciation", zh: "发音" },
+  "review.html": { en: "Review", zh: "复习" },
+  "flashcards.html": { en: "Flashcards", zh: "抽认卡" },
+  "stories.html": { en: "Stories", zh: "故事" },
+  "practice.html": { en: "Practice", zh: "练习" },
+  "writing.html": { en: "Writing", zh: "写作" },
+  "summary.html": { en: "Summary", zh: "总结" },
+  "notes.html": { en: "Daily Notes", zh: "每日笔记" }
 };
 
 const selectionPageHrefs = new Set([
@@ -485,7 +500,10 @@ let currentPracticeQuestions = [];
 let mediaRecorder;
 let recordingChunks = [];
 let recordingStream;
+let speechVoices = [];
+let speakingTimeout;
 let studySelections = loadStudySelections();
+let currentLanguage = window.localStorage.getItem(STORAGE_KEYS.language) || "en";
 
 const essayPrompts = [
   {
@@ -620,6 +638,173 @@ function currentPageHref() {
   return path || "index.html";
 }
 
+function t(en, zh) {
+  return currentLanguage === "zh" ? zh : en;
+}
+
+function insertLanguageToggle() {
+  const tabBar = document.querySelector(".tab-bar");
+  if (!tabBar || tabBar.querySelector(".language-toggle")) {
+    return;
+  }
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "tab-button language-toggle";
+  button.textContent = currentLanguage === "zh" ? "EN" : "中文";
+  button.addEventListener("click", () => {
+    currentLanguage = currentLanguage === "zh" ? "en" : "zh";
+    window.localStorage.setItem(STORAGE_KEYS.language, currentLanguage);
+    applyLanguage();
+    renderTopicFilters();
+    renderVocabulary(getFilteredVocabulary());
+    renderGrammar();
+    renderPronunciation();
+    renderFlashcards(getFilteredVocabulary());
+    renderReview();
+    renderStories();
+    renderExercises();
+    renderQuiz();
+    renderSummary();
+  });
+  tabBar.appendChild(button);
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
+
+  document.querySelectorAll(".tab-bar .tab-button[href]").forEach((link) => {
+    const href = link.getAttribute("href");
+    const label = NAV_LABELS[href];
+    if (label) {
+      link.textContent = currentLanguage === "zh" ? label.zh : label.en;
+    }
+  });
+
+  const toggle = document.querySelector(".language-toggle");
+  if (toggle) {
+    toggle.textContent = currentLanguage === "zh" ? "EN" : "中文";
+  }
+
+  const page = currentPageHref();
+  const pageTitles = {
+    "index.html": t("Spanish Learning", "西班牙语学习"),
+    "vocabulary.html": t("Spanish Learning - Vocabulary", "西班牙语学习 - 词汇"),
+    "grammar.html": t("Spanish Learning - Grammar", "西班牙语学习 - 语法"),
+    "pronunciation.html": t("Spanish Learning - Pronunciation", "西班牙语学习 - 发音"),
+    "review.html": t("Spanish Learning - Review", "西班牙语学习 - 复习"),
+    "flashcards.html": t("Spanish Learning - Flashcards", "西班牙语学习 - 抽认卡"),
+    "stories.html": t("Spanish Learning - Stories", "西班牙语学习 - 故事"),
+    "practice.html": t("Spanish Learning - Practice", "西班牙语学习 - 练习"),
+    "writing.html": t("Spanish Learning - Writing", "西班牙语学习 - 写作"),
+    "summary.html": t("Spanish Learning - Summary", "西班牙语学习 - 总结"),
+    "notes.html": t("Spanish Learning - Daily Notes", "西班牙语学习 - 每日笔记")
+  };
+  if (pageTitles[page]) {
+    document.title = pageTitles[page];
+  }
+
+  const selectorMap = {
+    "index.html": [
+      [".hero-kicker", t("Spanish Study Journal", "西班牙语学习笔记")],
+      ["h1", t("Learning Spanish", "学习西班牙语")],
+      ["h2", t("Read Me", "说明")]
+    ],
+    "vocabulary.html": [
+      ["h2", t("Vocabulary", "词汇")],
+      [".section-header .muted", t("Core words and example phrases pulled from the first five study days.", "整理自前五天学习内容的核心词汇和例句。")]
+    ],
+    "grammar.html": [
+      ["h2", t("Grammar", "语法")],
+      [".section-header .muted", t("Short explanations and reference tables for the main grammar points used in your lessons.", "课程主要语法点的简短说明和参考表。")]
+    ],
+    "pronunciation.html": [
+      ["h2", t("Pronunciation", "发音")],
+      [".section-header .muted", t("Play key words and complete model sentences. Use the slower pace to repeat after each line.", "播放关键词和示范句，用较慢速度逐句跟读。")],
+      [".card-label", t("Pronunciation Compare", "发音对比")],
+      ["#play-recording-target", t("Play Model", "播放示范")],
+      ["#start-recording", t("Start Recording", "开始录音")],
+      ["#stop-recording", t("Stop Recording", "停止录音")]
+    ],
+    "flashcards.html": [
+      ["h2", t("Flashcards", "抽认卡")],
+      [".section-header .muted", t("Click any card to reveal the English translation, then click again to hide it.", "点击卡片显示英文，再点一次隐藏。")]
+    ],
+    "stories.html": [
+      ["h2", t("Stories", "故事")],
+      [".section-header .muted", t("Read a short story built from the vocabulary so far, then review a few cartoon scenes with Spanish and English captions.", "阅读由已学词汇组成的短故事，再看带西英字幕的小场景。")],
+      ["#next-story", t("Random Story", "随机故事")]
+    ],
+    "practice.html": [
+      ["h2", t("Practice", "练习")],
+      [".section-header .muted", t("Build custom exercises and a generated quiz from the items you selected on the Vocabulary, Grammar, and Pronunciation pages.", "根据你在词汇、语法和发音页面勾选的内容生成练习和测验。")],
+      ["#check-quiz", t("Check Answers", "检查答案")]
+    ],
+    "writing.html": [
+      ["h2", t("Writing", "写作")],
+      [".section-header .muted", t("Practice short paragraphs for self-introduction, daily routine, and family topics.", "练习自我介绍、日常生活和家庭主题的短文。")],
+      ["#next-essay", t("Next Prompt", "下一个题目")],
+      ["#show-essay-answer", t("Show Model Answer", "显示范文")],
+      ["#check-writing", t("Check Writing", "检查写作")]
+    ],
+    "summary.html": [
+      ["h2", t("Learning Summary", "学习总结")]
+    ],
+    "notes.html": [
+      ["h2", t("Daily Notes", "每日笔记")]
+    ]
+  };
+
+  (selectorMap[page] || []).forEach(([selector, text]) => {
+    const node = document.querySelector(selector);
+    if (node) {
+      node.textContent = text;
+    }
+  });
+
+  const selectionLabel = document.querySelector(".selection-nav-label");
+  const selectionCopy = document.querySelector(".selection-nav-copy");
+  if (selectionLabel) {
+    selectionLabel.textContent = t("Selected Study", "已选学习内容");
+  }
+  if (selectionCopy) {
+    selectionCopy.textContent = t(
+      "These tabs are shown only for the items you selected in Vocabulary, Grammar, and Pronunciation.",
+      "这些页面只会在你于词汇、语法和发音中勾选内容后显示。"
+    );
+  }
+
+  if (page === "index.html") {
+    const introParagraphs = document.querySelectorAll(".card > p");
+    if (introParagraphs[0]) {
+      introParagraphs[0].textContent = t(
+        "This website is a personal Spanish study dashboard based on your first five days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
+        "这个网站是根据你前五天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
+      );
+    }
+    if (introParagraphs[1]) {
+      introParagraphs[1].innerHTML = currentLanguage === "zh"
+        ? "整体使用流程很简单。先看 <strong>说明</strong> 了解结构，再到 <strong>词汇</strong> 复习单词，用 <strong>语法</strong> 查看规则和变位表，接着到 <strong>发音</strong> 听示范并录音，用 <strong>复习</strong> 和 <strong>抽认卡</strong> 聚焦已选内容，再在 <strong>故事</strong>、<strong>练习</strong> 和 <strong>写作</strong> 中应用，最后通过 <strong>总结</strong> 查看学习建议，并把 <strong>每日笔记</strong> 当作课程参考。"
+        : "The overall workflow is simple. Start with <strong>Read Me</strong> for orientation, move to <strong>Vocabulary</strong> for word review, use <strong>Grammar</strong> for reference and verb tables, go to <strong>Pronunciation</strong> to listen and record, use <strong>Review</strong> and <strong>Flashcards</strong> to focus selected items, practice them in <strong>Stories</strong>, <strong>Practice</strong>, and <strong>Writing</strong>, check <strong>Summary</strong> for learning suggestions, and use <strong>Daily Notes</strong> as lesson reference.";
+    }
+    const infoPanels = document.querySelectorAll(".info-panel");
+    if (infoPanels[0]) infoPanels[0].querySelector("h3").textContent = t("Current Sections", "当前页面");
+    if (infoPanels[1]) infoPanels[1].querySelector("h3").textContent = t("How To Use", "使用方法");
+    if (infoPanels[2]) infoPanels[2].querySelector("h3").textContent = t("Selection-Based Study Block", "基于勾选的学习模块");
+    if (infoPanels[3]) infoPanels[3].querySelector("h3").textContent = t("What Has Been Customized", "已定制内容");
+    if (infoPanels[4]) infoPanels[4].querySelector("h3").textContent = t("Current Limits", "当前限制");
+    if (infoPanels[5]) infoPanels[5].querySelector("h3").textContent = t("Requested Changes Log", "需求变更记录");
+    if (infoPanels[6]) infoPanels[6].querySelector("h3").textContent = t("Vocabulary Decisions", "词汇设置说明");
+  }
+
+  if (vocabSearch) {
+    vocabSearch.placeholder = t("Search Spanish, English, Chinese, or example", "搜索西语、英语、中文或例句");
+  }
+  if (essayResponse) {
+    essayResponse.placeholder = t("Write your Spanish paragraph here.", "在这里写你的西语短文。");
+  }
+}
+
 function updateSelectionNavigation() {
   const mainNav = document.querySelector(".tab-bar");
   if (!mainNav || mainNav.classList.contains("selection-tab-bar")) {
@@ -715,6 +900,26 @@ function loadQuizHistory() {
   }
 }
 
+function updateSpeechVoices() {
+  if (!("speechSynthesis" in window)) {
+    return [];
+  }
+
+  speechVoices = window.speechSynthesis.getVoices();
+  return speechVoices;
+}
+
+function getPreferredSpanishVoice() {
+  const voices = speechVoices.length ? speechVoices : updateSpeechVoices();
+  if (!voices.length) {
+    return null;
+  }
+
+  return voices.find((voice) => ["es-MX", "es-US", "es-ES"].includes(voice.lang))
+    || voices.find((voice) => voice.lang.toLowerCase().startsWith("es"))
+    || null;
+}
+
 function saveQuizAttempt(score, total) {
   const history = loadQuizHistory();
   history.unshift({
@@ -744,9 +949,16 @@ function renderTopicFilters() {
   if (!topicFilters) {
     return;
   }
+  const topicLabels = {
+    All: t("All", "全部"),
+    Verbs: t("Verbs", "动词"),
+    Feelings: t("Feelings", "感受"),
+    Places: t("Places", "地点"),
+    Questions: t("Questions", "疑问句")
+  };
   topicFilters.innerHTML = filterOptions.map((option) => `
     <button class="filter-chip ${option === activeTopicFilter ? "active" : ""}" type="button" data-topic="${option}">
-      ${option}
+      ${topicLabels[option]}
     </button>
   `).join("");
 }
@@ -761,10 +973,10 @@ function renderVocabulary(items) {
         <thead>
           <tr>
             <th scope="col">Pick</th>
-            <th scope="col">Spanish</th>
-            <th scope="col">English</th>
-            <th scope="col">Chinese</th>
-            <th scope="col">Examples</th>
+            <th scope="col">${t("Spanish", "西班牙语")}</th>
+            <th scope="col">${t("English", "英语")}</th>
+            <th scope="col">${t("Chinese", "中文")}</th>
+            <th scope="col">${t("Examples", "例句")}</th>
           </tr>
         </thead>
         <tbody>
@@ -809,10 +1021,10 @@ function renderGrammar() {
     <article class="grammar-card">
       <div class="grammar-heading">
         <div class="grammar-title-row">
-          <p class="grammar-kicker">Grammar Point</p>
+          <p class="grammar-kicker">${t("Grammar Point", "语法点")}</p>
           <label class="checkbox-label">
             <input class="study-checkbox" type="checkbox" data-selection-group="grammar" data-selection-key="${point.id}" ${isSelected("grammar", point.id) ? "checked" : ""}>
-            <span>Select</span>
+            <span>${t("Select", "选择")}</span>
           </label>
         </div>
         <h3>${point.title}</h3>
@@ -821,13 +1033,13 @@ function renderGrammar() {
       <div class="grammar-body">
         <div class="grammar-notes">
           <section class="grammar-list-block">
-            <p class="grammar-subtitle">Key Notes</p>
+            <p class="grammar-subtitle">${t("Key Notes", "要点")}</p>
             <ul class="note-list">
               ${point.details.map((detail) => `<li>${detail}</li>`).join("")}
             </ul>
           </section>
           <section class="grammar-list-block">
-            <p class="grammar-subtitle">Examples</p>
+            <p class="grammar-subtitle">${t("Examples", "例子")}</p>
             <ul class="note-list">
               ${point.examples.map((example) => `<li>${example}</li>`).join("")}
             </ul>
@@ -835,7 +1047,7 @@ function renderGrammar() {
         </div>
         ${point.table ? `
           <section class="grammar-list-block grammar-table-block">
-            <p class="grammar-subtitle">Reference Table</p>
+            <p class="grammar-subtitle">${t("Reference Table", "参考表")}</p>
             <div class="grammar-table-wrap">
               <table class="grammar-table">
                 <thead>
@@ -862,7 +1074,7 @@ function renderFlashcards(items) {
   const sourceItems = getSelectedVocabulary().length ? getSelectedVocabulary() : items;
   flashcardList.innerHTML = sourceItems.map((item) => `
     <button class="flashcard" type="button" aria-label="Show English translation for ${item.spanish}" aria-pressed="false">
-      <span class="flashcard-label">Spanish</span>
+      <span class="flashcard-label">${t("Spanish", "西班牙语")}</span>
       <span class="flashcard-front">${item.spanish}</span>
       <span class="flashcard-back hidden">${item.english}</span>
     </button>
@@ -876,10 +1088,13 @@ function renderPronunciation() {
   const filteredWords = getFilteredVocabulary().slice(0, 12).map((item) => item.spanish);
   const sections = [
     {
-      title: "Filtered Words",
+      title: t("Filtered Words", "筛选词汇"),
       items: filteredWords.length ? filteredWords : [currentRecordingTarget]
     },
-    pronunciationSections[1]
+    {
+      ...pronunciationSections[1],
+      title: t("Model Sentences", "示范句")
+    }
   ];
 
   pronunciationList.innerHTML = sections.map((section) => `
@@ -890,11 +1105,11 @@ function renderPronunciation() {
           <div class="pronunciation-row">
             <label class="checkbox-label">
               <input class="study-checkbox" type="checkbox" data-selection-group="pronunciation" data-selection-key="${getPronunciationItemKey(item)}" ${isSelected("pronunciation", getPronunciationItemKey(item)) ? "checked" : ""}>
-              <span>Select</span>
+              <span>${t("Select", "选择")}</span>
             </label>
             <button class="pronunciation-button" type="button" data-speak="${item}" aria-label="Play pronunciation for ${item}">
               <span class="pronunciation-text">${item}</span>
-              <span class="pronunciation-play">Play</span>
+              <span class="pronunciation-play">${t("Play", "播放")}</span>
             </button>
           </div>
         `).join("")}
@@ -915,8 +1130,8 @@ function renderReview() {
   if (!selectedVocabulary.length && !selectedGrammar.length && !selectedPronunciation.length) {
     reviewContent.innerHTML = `
       <article class="info-panel">
-        <h3>No Items Selected Yet</h3>
-        <p>Select items from Vocabulary, Grammar, and Pronunciation to build a focused review page.</p>
+        <h3>${t("No Items Selected Yet", "还没有选择内容")}</h3>
+        <p>${t("Select items from Vocabulary, Grammar, and Pronunciation to build a focused review page.", "请先在词汇、语法和发音页面勾选内容，系统会生成专门的复习页。")}</p>
       </article>
     `;
     return;
@@ -925,14 +1140,14 @@ function renderReview() {
   reviewContent.innerHTML = `
     ${selectedVocabulary.length ? `
       <article class="card">
-        <h2>Vocabulary Review</h2>
+        <h2>${t("Vocabulary Review", "词汇复习")}</h2>
         <div class="review-grid">
           ${selectedVocabulary.map((item) => `
             <section class="review-card">
               <h3>${item.spanish}</h3>
-              <p><strong>English:</strong> ${item.english}</p>
-              <p><strong>Chinese:</strong> ${item.chinese}</p>
-              <p><strong>Why it matters:</strong> ${item.examples[0]}</p>
+              <p><strong>${t("English", "英语")}:</strong> ${item.english}</p>
+              <p><strong>${t("Chinese", "中文")}:</strong> ${item.chinese}</p>
+              <p><strong>${t("Why it matters", "为什么重要")}:</strong> ${item.examples[0]}</p>
             </section>
           `).join("")}
         </div>
@@ -940,7 +1155,7 @@ function renderReview() {
     ` : ""}
     ${selectedGrammar.length ? `
       <article class="card">
-        <h2>Grammar Review</h2>
+        <h2>${t("Grammar Review", "语法复习")}</h2>
         <div class="review-grid">
           ${selectedGrammar.map((point) => `
             <section class="review-card">
@@ -954,13 +1169,13 @@ function renderReview() {
     ` : ""}
     ${selectedPronunciation.length ? `
       <article class="card">
-        <h2>Pronunciation Review</h2>
+        <h2>${t("Pronunciation Review", "发音复习")}</h2>
         <div class="review-grid">
           ${selectedPronunciation.map((item) => `
             <section class="review-card">
               <h3>${item.text}</h3>
-              <p><strong>Section:</strong> ${item.title}</p>
-              <p><strong>Practice idea:</strong> Play it, repeat it three times, then record your own version.</p>
+              <p><strong>${t("Section", "类别")}:</strong> ${item.title}</p>
+              <p><strong>${t("Practice idea", "练习建议")}:</strong> ${t("Play it, repeat it three times, then record your own version.", "先播放，跟读三遍，然后录下自己的版本。")}</p>
             </section>
           `).join("")}
         </div>
@@ -1026,7 +1241,7 @@ function renderExercises() {
 
   exerciseList.innerHTML = exercises.length
     ? exercises.map((exercise) => `<li>${exercise}</li>`).join("")
-    : "<li>Select items from Vocabulary, Grammar, or Pronunciation to build custom exercises.</li>";
+    : `<li>${t("Select items from Vocabulary, Grammar, or Pronunciation to build custom exercises.", "请先在词汇、语法或发音页面勾选内容以生成自定义练习。")}</li>`;
 }
 
 function renderSummary() {
@@ -1043,10 +1258,10 @@ function renderSummary() {
   };
 
   summaryOverview.innerHTML = `
-    <p><strong>Selected vocabulary:</strong> ${selectedCounts.vocabulary}</p>
-    <p><strong>Selected grammar points:</strong> ${selectedCounts.grammar}</p>
-    <p><strong>Selected pronunciation items:</strong> ${selectedCounts.pronunciation}</p>
-    <p><strong>Latest quiz score:</strong> ${latest ? `${latest.score} / ${latest.total}` : "No quiz attempts yet."}</p>
+    <p><strong>${t("Selected vocabulary", "已选词汇")}:</strong> ${selectedCounts.vocabulary}</p>
+    <p><strong>${t("Selected grammar points", "已选语法点")}:</strong> ${selectedCounts.grammar}</p>
+    <p><strong>${t("Selected pronunciation items", "已选发音项目")}:</strong> ${selectedCounts.pronunciation}</p>
+    <p><strong>${t("Latest quiz score", "最近测验分数")}:</strong> ${latest ? `${latest.score} / ${latest.total}` : t("No quiz attempts yet.", "还没有测验记录。")}</p>
   `;
 
   const suggestions = [];
@@ -1064,7 +1279,7 @@ function renderSummary() {
   summarySuggestions.innerHTML = `<ul class="note-list">${suggestions.map((item) => `<li>${item}</li>`).join("")}</ul>`;
   summaryHistory.innerHTML = history.length
     ? history.map((item) => `<li>${new Date(item.timestamp).toLocaleString()}: ${item.score} / ${item.total}</li>`).join("")
-    : "<li>No quiz history yet.</li>";
+    : `<li>${t("No quiz history yet.", "还没有测验记录。")}</li>`;
 }
 
 function speakSpanish(text) {
@@ -1073,11 +1288,43 @@ function speakSpanish(text) {
     return;
   }
 
-  window.speechSynthesis.cancel();
+  const synth = window.speechSynthesis;
+  const preferredVoice = getPreferredSpanishVoice();
+
+  if (speakingTimeout) {
+    window.clearTimeout(speakingTimeout);
+  }
+
+  synth.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "es-ES";
+  utterance.lang = preferredVoice?.lang || "es-MX";
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
   utterance.rate = 0.92;
-  window.speechSynthesis.speak(utterance);
+  utterance.pitch = 1;
+
+  if (recordingStatus) {
+    recordingStatus.textContent = `Playing model: ${text}`;
+    recordingStatus.classList.remove("muted");
+  }
+
+  utterance.onend = () => {
+    if (recordingStatus) {
+      recordingStatus.textContent = "Model audio finished. You can record your version now.";
+    }
+  };
+
+  utterance.onerror = () => {
+    if (recordingStatus) {
+      recordingStatus.textContent = "Browser speech playback failed. Refresh Chrome or check macOS sound settings.";
+    }
+  };
+
+  synth.resume();
+  speakingTimeout = window.setTimeout(() => {
+    synth.speak(utterance);
+  }, 40);
 }
 
 function setRecordingTarget(text) {
@@ -1693,6 +1940,12 @@ if (stopRecordingButton) {
 }
 
 updateSelectionNavigation();
+insertLanguageToggle();
+applyLanguage();
+if ("speechSynthesis" in window) {
+  updateSpeechVoices();
+  window.speechSynthesis.addEventListener("voiceschanged", updateSpeechVoices);
+}
 renderTopicFilters();
 renderRandomBanner();
 renderVocabulary(getFilteredVocabulary());

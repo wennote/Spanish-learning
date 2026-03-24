@@ -209,6 +209,10 @@ button {
   color: #334155;
 }
 
+.language-toggle {
+  margin-left: auto;
+}
+
 .tab-button.active,
 button {
   background: linear-gradient(135deg, #5d7bff, #4f6df5);
@@ -257,6 +261,10 @@ button:hover,
   .hero-copy {
     max-width: 100%;
     padding: 16px 18px;
+  }
+
+  .language-toggle {
+    margin-left: 0;
   }
 
 }
