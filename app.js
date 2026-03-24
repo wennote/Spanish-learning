@@ -3,6 +3,7 @@ const vocabList = document.getElementById("vocab-list");
 const vocabSearch = document.getElementById("vocab-search");
 const topicFilters = document.getElementById("topic-filters");
 const grammarList = document.getElementById("grammar-list");
+const verbTables = document.getElementById("verb-tables");
 const pronunciationList = document.getElementById("pronunciation-list");
 const flashcardList = document.getElementById("flashcard-list");
 const reviewContent = document.getElementById("review-content");
@@ -35,13 +36,15 @@ const recordingPlayback = document.getElementById("recording-playback");
 const STORAGE_KEYS = {
   studySelections: "spanish-learning-selections",
   quizHistory: "spanish-learning-quiz-history",
-  language: "spanish-learning-language"
+  language: "spanish-learning-language",
+  reviewMeaningMode: "spanish-learning-review-meaning-mode"
 };
 
 const NAV_LABELS = {
   "index.html": { en: "Read Me", zh: "说明" },
   "vocabulary.html": { en: "Vocabulary", zh: "词汇" },
   "grammar.html": { en: "Grammar", zh: "语法" },
+  "verbs.html": { en: "Verb Tables", zh: "动词变位表" },
   "pronunciation.html": { en: "Pronunciation", zh: "发音" },
   "review.html": { en: "Review", zh: "复习" },
   "flashcards.html": { en: "Flashcards", zh: "抽认卡" },
@@ -71,7 +74,19 @@ const pronunciationSections = [
       "querer",
       "mi familia",
       "ayer",
-      "después"
+      "después",
+      "jugar",
+      "viajar",
+      "jugué",
+      "viajé",
+      "voy a jugar",
+      "voy a viajar",
+      "jugaré",
+      "viajaré",
+      "iré",
+      "tendré",
+      "haré",
+      "sabré"
     ]
   },
   {
@@ -82,7 +97,12 @@ const pronunciationSections = [
       "Mi familia vive en China.",
       "Ayer fui a la escuela y después cociné arroz.",
       "Quiero hablar más español cada día.",
-      "Por la mañana estudio, trabajo y hago la comida."
+      "Por la mañana estudio, trabajo y hago la comida.",
+      "Ayer jugué con mi familia.",
+      "El fin de semana pasado viajé a Japón con mis amigos por trabajo.",
+      "Mañana voy a jugar con mis amigos.",
+      "En el futuro viajaré a muchos países.",
+      "Algún día sabré hablar español muy bien."
     ]
   }
 ];
@@ -96,7 +116,11 @@ const grammarPoints = [
       "The subject pronoun is often optional because the verb ending already shows who is doing the action.",
       "This pattern is used for habits, daily routines, and actions happening now."
     ],
-    examples: ["hablar -> hablo", "comer -> comemos", "vivir -> viven"],
+    examples: [
+      { spanish: "hablar -> hablo", english: "hablar -> I speak" },
+      { spanish: "comer -> comemos", english: "comer -> we eat" },
+      { spanish: "vivir -> viven", english: "vivir -> they live" }
+    ],
     table: {
       headers: ["Subject", "-ar", "-er", "-ir"],
       rows: [
@@ -116,7 +140,11 @@ const grammarPoints = [
       "Estar is used for where someone or something is and how a person feels right now.",
       "A common beginner mistake is using ser for location. Say `estoy en casa`, not `soy en casa`."
     ],
-    examples: ["Soy de Florida.", "Estoy en casa.", "Hoy estoy contento."],
+    examples: [
+      { spanish: "Soy de Florida.", english: "I am from Florida." },
+      { spanish: "Estoy en casa.", english: "I am at home." },
+      { spanish: "Hoy estoy contento.", english: "Today I am happy." }
+    ],
     table: {
       headers: ["Subject", "ser", "estar"],
       rows: [
@@ -136,7 +164,11 @@ const grammarPoints = [
       "Spanish uses opening and closing question marks: `¿ ... ?`.",
       "These words help build speaking practice because you can answer them with short, useful sentences."
     ],
-    examples: ["¿Qué haces?", "¿Dónde vas?", "¿Cómo estás?"],
+    examples: [
+      { spanish: "¿Qué haces?", english: "What are you doing?" },
+      { spanish: "¿Dónde vas?", english: "Where are you going?" },
+      { spanish: "¿Cómo estás?", english: "How are you?" }
+    ],
     table: {
       headers: ["Spanish", "English", "Use"],
       rows: [
@@ -156,7 +188,11 @@ const grammarPoints = [
       "Some important verbs are irregular and must be memorized: `ir -> fui`, `tener -> tuve`, `hacer -> hice`, `querer -> quise`.",
       "This tense is useful for short finished actions: where you went, what you did, and what happened yesterday."
     ],
-    examples: ["Ayer fui a la escuela.", "Ayer trabajé.", "Ayer hice arroz."],
+    examples: [
+      { spanish: "Ayer fui a la escuela.", english: "Yesterday I went to school." },
+      { spanish: "Ayer trabajé.", english: "Yesterday I worked." },
+      { spanish: "Ayer hice arroz.", english: "Yesterday I made rice." }
+    ],
     table: {
       headers: ["Infinitive", "Yo Preterite", "Type"],
       rows: [
@@ -178,13 +214,90 @@ const grammarPoints = [
       "These words make your writing sound more natural because they connect short statements.",
       "A good beginner goal is to link two simple ideas instead of writing only isolated sentences."
     ],
-    examples: ["porque = because", "pero = but", "después = afterward"],
+    examples: [
+      { spanish: "porque = porque estudio español", english: "because = because I study Spanish" },
+      { spanish: "pero = quiero pizza, pero hago arroz", english: "but = I want pizza, but I make rice" },
+      { spanish: "después = después estudio un poco más", english: "afterward = afterward I study a little more" }
+    ],
     table: {
       headers: ["Connector", "Meaning", "Example"],
       rows: [
         ["porque", "because", "Estoy contento porque estudio."],
         ["pero", "but", "Quiero pizza, pero hago arroz."],
         ["después", "afterward", "Después estudio un poco más."]
+      ]
+    }
+  },
+  {
+    title: "Voy a + Infinitive",
+    rule: "Use `voy a + infinitive` to talk about the near future or a planned next action.",
+    details: [
+      "This pattern is very common in conversation and is easier for beginners than using the simple future every time.",
+      "Use the present form of ir plus `a` plus an infinitive: `voy a jugar`, `voy a viajar`, `voy a estudiar`.",
+      "It works well with time words such as `mañana`, `este fin de semana`, or `hoy`."
+    ],
+    examples: [
+      { spanish: "Mañana voy a jugar con mi familia.", english: "Tomorrow I am going to play with my family." },
+      { spanish: "Mañana voy a viajar a México.", english: "Tomorrow I am going to travel to Mexico." },
+      { spanish: "Este fin de semana voy a estudiar español en casa.", english: "This weekend I am going to study Spanish at home." }
+    ],
+    table: {
+      headers: ["Pattern", "Meaning", "Example"],
+      rows: [
+        ["voy a + infinitive", "I am going to ...", "voy a jugar"],
+        ["vas a + infinitive", "you are going to ...", "vas a viajar"],
+        ["vamos a + infinitive", "we are going to ...", "vamos a estudiar"]
+      ]
+    }
+  },
+  {
+    title: "Simple Future",
+    rule: "The simple future talks about what will happen later. For regular verbs, keep the whole infinitive and add the future ending.",
+    details: [
+      "For regular verbs such as `jugar` and `viajar`, do not remove `-ar`; add the future ending to the full infinitive.",
+      "The yo ending is `-é`: `jugaré`, `viajaré`.",
+      "This tense is useful for predictions, long-term plans, and statements with phrases like `en el futuro`."
+    ],
+    examples: [
+      { spanish: "En el futuro jugaré más con mi familia.", english: "In the future I will play more with my family." },
+      { spanish: "En el futuro viajaré a muchos países.", english: "In the future I will travel to many countries." },
+      { spanish: "Mañana estudiaré más español.", english: "Tomorrow I will study more Spanish." }
+    ],
+    table: {
+      headers: ["Infinitive", "Yo Future", "Meaning"],
+      rows: [
+        ["jugar", "jugaré", "I will play"],
+        ["viajar", "viajaré", "I will travel"],
+        ["estudiar", "estudiaré", "I will study"]
+      ]
+    }
+  },
+  {
+    title: "Irregular Future Stems",
+    rule: "Some common verbs change their stem in the simple future and must be memorized.",
+    details: [
+      "These verbs still use the normal future endings, but the stem changes first: `tener -> tendr-`, `hacer -> har-`, `decir -> dir-`.",
+      "They are high-frequency verbs, so learning them early makes future plans much easier to say.",
+      "A good beginner strategy is to memorize them in short model sentences."
+    ],
+    examples: [
+      { spanish: "Mañana iré al trabajo en tren.", english: "Tomorrow I will go to work by train." },
+      { spanish: "En el futuro tendré más tiempo para viajar.", english: "In the future I will have more time to travel." },
+      { spanish: "Algún día sabré hablar español muy bien.", english: "Someday I will know how to speak Spanish very well." }
+    ],
+    table: {
+      headers: ["Infinitive", "Yo Future", "Stem Change"],
+      rows: [
+        ["ir", "iré", "ir-"],
+        ["tener", "tendré", "tendr-"],
+        ["salir", "saldré", "saldr-"],
+        ["venir", "vendré", "vendr-"],
+        ["hacer", "haré", "har-"],
+        ["decir", "diré", "dir-"],
+        ["poder", "podré", "podr-"],
+        ["poner", "pondré", "pondr-"],
+        ["querer", "querré", "querr-"],
+        ["saber", "sabré", "sabr-"]
       ]
     }
   },
@@ -196,7 +309,11 @@ const grammarPoints = [
       "Then add the action and one more detail such as place, object, or feeling.",
       "This pattern helps build easy paragraphs: `Hoy estudio español en casa.`"
     ],
-    examples: ["Hoy estudio español en casa.", "Ayer cociné arroz después del trabajo.", "Por la noche estoy cansado pero contento."],
+    examples: [
+      { spanish: "Hoy estudio español en casa.", english: "Today I study Spanish at home." },
+      { spanish: "Ayer cociné arroz después del trabajo.", english: "Yesterday I cooked rice after work." },
+      { spanish: "Por la noche estoy cansado pero contento.", english: "At night I am tired but happy." }
+    ],
     table: {
       headers: ["Part", "Purpose", "Example"],
       rows: [
@@ -207,6 +324,153 @@ const grammarPoints = [
     }
   }
 ].map((point) => ({ ...point, id: `grammar-${slugify(point.title)}` }));
+
+const verbTableSections = [
+  {
+    title: "Regular Verbs",
+    description: "These model tables show the full patterns for one regular -ar, -er, and -ir verb across present, simple past, present perfect, and future.",
+    tables: [
+      {
+        verb: "hablar",
+        english: "to speak",
+        note: "Regular -ar model",
+        rows: [
+          ["yo", "hablo", "hablé", "he hablado", "hablaré"],
+          ["tú", "hablas", "hablaste", "has hablado", "hablarás"],
+          ["él / ella / usted", "habla", "habló", "ha hablado", "hablará"],
+          ["nosotros", "hablamos", "hablamos", "hemos hablado", "hablaremos"],
+          ["ellos / ellas / ustedes", "hablan", "hablaron", "han hablado", "hablarán"]
+        ]
+      },
+      {
+        verb: "comer",
+        english: "to eat",
+        note: "Regular -er model",
+        rows: [
+          ["yo", "como", "comí", "he comido", "comeré"],
+          ["tú", "comes", "comiste", "has comido", "comerás"],
+          ["él / ella / usted", "come", "comió", "ha comido", "comerá"],
+          ["nosotros", "comemos", "comimos", "hemos comido", "comeremos"],
+          ["ellos / ellas / ustedes", "comen", "comieron", "han comido", "comerán"]
+        ]
+      },
+      {
+        verb: "vivir",
+        english: "to live",
+        note: "Regular -ir model",
+        rows: [
+          ["yo", "vivo", "viví", "he vivido", "viviré"],
+          ["tú", "vives", "viviste", "has vivido", "vivirás"],
+          ["él / ella / usted", "vive", "vivió", "ha vivido", "vivirá"],
+          ["nosotros", "vivimos", "vivimos", "hemos vivido", "viviremos"],
+          ["ellos / ellas / ustedes", "viven", "vivieron", "han vivido", "vivirán"]
+        ]
+      }
+    ]
+  },
+  {
+    title: "Common Irregular Verbs",
+    description: "Each table below shows one high-frequency irregular verb with the same four tenses for quick comparison.",
+    tables: [
+      {
+        verb: "ser",
+        english: "to be",
+        note: "Highly irregular",
+        rows: [
+          ["yo", "soy", "fui", "he sido", "seré"],
+          ["tú", "eres", "fuiste", "has sido", "serás"],
+          ["él / ella / usted", "es", "fue", "ha sido", "será"],
+          ["nosotros", "somos", "fuimos", "hemos sido", "seremos"],
+          ["ellos / ellas / ustedes", "son", "fueron", "han sido", "serán"]
+        ]
+      },
+      {
+        verb: "estar",
+        english: "to be",
+        note: "Irregular present, regular participle",
+        rows: [
+          ["yo", "estoy", "estuve", "he estado", "estaré"],
+          ["tú", "estás", "estuviste", "has estado", "estarás"],
+          ["él / ella / usted", "está", "estuvo", "ha estado", "estará"],
+          ["nosotros", "estamos", "estuvimos", "hemos estado", "estaremos"],
+          ["ellos / ellas / ustedes", "están", "estuvieron", "han estado", "estarán"]
+        ]
+      },
+      {
+        verb: "ir",
+        english: "to go",
+        note: "Irregular across several tenses",
+        rows: [
+          ["yo", "voy", "fui", "he ido", "iré"],
+          ["tú", "vas", "fuiste", "has ido", "irás"],
+          ["él / ella / usted", "va", "fue", "ha ido", "irá"],
+          ["nosotros", "vamos", "fuimos", "hemos ido", "iremos"],
+          ["ellos / ellas / ustedes", "van", "fueron", "han ido", "irán"]
+        ]
+      },
+      {
+        verb: "tener",
+        english: "to have",
+        note: "Irregular present, preterite, and future stem",
+        rows: [
+          ["yo", "tengo", "tuve", "he tenido", "tendré"],
+          ["tú", "tienes", "tuviste", "has tenido", "tendrás"],
+          ["él / ella / usted", "tiene", "tuvo", "ha tenido", "tendrá"],
+          ["nosotros", "tenemos", "tuvimos", "hemos tenido", "tendremos"],
+          ["ellos / ellas / ustedes", "tienen", "tuvieron", "han tenido", "tendrán"]
+        ]
+      },
+      {
+        verb: "hacer",
+        english: "to do / make",
+        note: "Irregular preterite and participle",
+        rows: [
+          ["yo", "hago", "hice", "he hecho", "haré"],
+          ["tú", "haces", "hiciste", "has hecho", "harás"],
+          ["él / ella / usted", "hace", "hizo", "ha hecho", "hará"],
+          ["nosotros", "hacemos", "hicimos", "hemos hecho", "haremos"],
+          ["ellos / ellas / ustedes", "hacen", "hicieron", "han hecho", "harán"]
+        ]
+      },
+      {
+        verb: "querer",
+        english: "to want / to love",
+        note: "Irregular present, preterite, and future stem",
+        rows: [
+          ["yo", "quiero", "quise", "he querido", "querré"],
+          ["tú", "quieres", "quisiste", "has querido", "querrás"],
+          ["él / ella / usted", "quiere", "quiso", "ha querido", "querrá"],
+          ["nosotros", "queremos", "quisimos", "hemos querido", "querremos"],
+          ["ellos / ellas / ustedes", "quieren", "quisieron", "han querido", "querrán"]
+        ]
+      },
+      {
+        verb: "poder",
+        english: "to be able to / can",
+        note: "Stem-changing present and irregular future stem",
+        rows: [
+          ["yo", "puedo", "pude", "he podido", "podré"],
+          ["tú", "puedes", "pudiste", "has podido", "podrás"],
+          ["él / ella / usted", "puede", "pudo", "ha podido", "podrá"],
+          ["nosotros", "podemos", "pudimos", "hemos podido", "podremos"],
+          ["ellos / ellas / ustedes", "pueden", "pudieron", "han podido", "podrán"]
+        ]
+      },
+      {
+        verb: "decir",
+        english: "to say / to tell",
+        note: "Irregular across all four tenses here",
+        rows: [
+          ["yo", "digo", "dije", "he dicho", "diré"],
+          ["tú", "dices", "dijiste", "has dicho", "dirás"],
+          ["él / ella / usted", "dice", "dijo", "ha dicho", "dirá"],
+          ["nosotros", "decimos", "dijimos", "hemos dicho", "diremos"],
+          ["ellos / ellas / ustedes", "dicen", "dijeron", "han dicho", "dirán"]
+        ]
+      }
+    ]
+  }
+];
 
 const filterOptions = ["All", "Verbs", "Feelings", "Places", "Questions"];
 
@@ -265,7 +529,38 @@ const vocabulary = [
   { spanish: "arroz", english: "rice", chinese: "米饭", pos: "Noun", day: "Day 5", examples: ["Hice arroz en casa.", "Hoy como arroz también."] },
   { spanish: "más", english: "more", chinese: "更; 更多", pos: "Adverb", day: "Day 5", examples: ["Quiero estudiar más.", "Hoy practico más español."] },
   { spanish: "corta", english: "short", chinese: "短的", pos: "Adjective", day: "Day 5", examples: ["Es una historia corta.", "La clase fue corta."] },
-  { spanish: "sobre", english: "about", chinese: "关于", pos: "Preposition", day: "Day 5", examples: ["Escribo una historia sobre mi familia.", "Hablo sobre mi trabajo."] }
+  { spanish: "sobre", english: "about", chinese: "关于", pos: "Preposition", day: "Day 5", examples: ["Escribo una historia sobre mi familia.", "Hablo sobre mi trabajo."] },
+  { spanish: "jugar", english: "to play", chinese: "玩; 进行(游戏/运动)", pos: "Verb", day: "Day 6", examples: ["Mañana voy a jugar con mis amigos.", "Me gusta jugar con mi familia."] },
+  { spanish: "juego", english: "I play", chinese: "我玩; 我进行", pos: "Verb", day: "Day 6", examples: ["Hoy juego en casa.", "A veces juego con mis amigos."] },
+  { spanish: "jugué", english: "I played", chinese: "我玩了", pos: "Verb", day: "Day 6", examples: ["Ayer jugué con mi familia.", "Cuando era niño, jugué mucho con mis amigos."] },
+  { spanish: "jugaré", english: "I will play", chinese: "我将会玩", pos: "Verb", day: "Day 6", examples: ["En el futuro jugaré más con mi familia.", "Mañana jugaré con mis amigos."] },
+  { spanish: "viajar", english: "to travel", chinese: "旅行", pos: "Verb", day: "Day 6", examples: ["Voy a viajar a México.", "Me gusta viajar por trabajo y por placer."] },
+  { spanish: "viajo", english: "I travel", chinese: "我旅行", pos: "Verb", day: "Day 6", examples: ["Hoy viajo a China.", "A veces viajo por trabajo."] },
+  { spanish: "viajé", english: "I traveled", chinese: "我旅行了", pos: "Verb", day: "Day 6", examples: ["El fin de semana pasado viajé a Japón con mis amigos por trabajo.", "El año pasado viajé mucho."] },
+  { spanish: "viajaré", english: "I will travel", chinese: "我将会旅行", pos: "Verb", day: "Day 6", examples: ["En el futuro viajaré a muchos países.", "Algún día viajaré más con mi familia."] },
+  { spanish: "voy a jugar", english: "I am going to play", chinese: "我打算去玩", pos: "Phrase", day: "Day 6", examples: ["Mañana voy a jugar con mis amigos.", "Hoy voy a jugar un poco en casa."] },
+  { spanish: "voy a viajar", english: "I am going to travel", chinese: "我打算去旅行", pos: "Phrase", day: "Day 6", examples: ["Mañana voy a viajar a México.", "Este verano voy a viajar mucho."] },
+  { spanish: "mañana", english: "tomorrow", chinese: "明天", pos: "Adverb", day: "Day 6", examples: ["Mañana voy a jugar con mis amigos.", "Mañana viajaré temprano."] },
+  { spanish: "anoche", english: "last night", chinese: "昨晚", pos: "Adverb", day: "Day 6", examples: ["Anoche estudié español en casa.", "Anoche hablé con mi familia."] },
+  { spanish: "otra vez", english: "again", chinese: "再一次", pos: "Phrase", day: "Day 6", examples: ["Voy a practicar otra vez.", "Dilo otra vez, por favor."] },
+  { spanish: "el fin de semana pasado", english: "last weekend", chinese: "上个周末", pos: "Phrase", day: "Day 6", examples: ["El fin de semana pasado viajé a Japón.", "El fin de semana pasado descansé en casa."] },
+  { spanish: "el próximo año", english: "next year", chinese: "明年", pos: "Phrase", day: "Day 6", examples: ["El próximo año voy a viajar más.", "El próximo año estudiaré más español."] },
+  { spanish: "el parque", english: "the park", chinese: "公园", pos: "Noun", day: "Day 6", examples: ["Voy al parque con mi familia.", "El parque está cerca de mi casa."] },
+  { spanish: "fútbol", english: "soccer / football", chinese: "足球", pos: "Noun", day: "Day 6", examples: ["Me gusta jugar fútbol.", "Ayer jugué fútbol con mis amigos."] },
+  { spanish: "por trabajo", english: "for work", chinese: "因为工作", pos: "Phrase", day: "Day 6", examples: ["Viajé a Japón por trabajo.", "A veces viajo por trabajo."] },
+  { spanish: "en el futuro", english: "in the future", chinese: "在未来", pos: "Phrase", day: "Day 6", examples: ["En el futuro jugaré más con mi familia.", "En el futuro viajaré a muchos países."] },
+  { spanish: "muchos países", english: "many countries", chinese: "许多国家", pos: "Phrase", day: "Day 6", examples: ["Viajaré a muchos países.", "Quiero conocer muchos países."] },
+  { spanish: "algún día", english: "someday", chinese: "有一天", pos: "Phrase", day: "Day 6", examples: ["Algún día sabré hablar español muy bien.", "Algún día viajaré a España."] },
+  { spanish: "iré", english: "I will go", chinese: "我将会去", pos: "Verb", day: "Day 6", examples: ["Mañana iré al trabajo en tren.", "Algún día iré a España."] },
+  { spanish: "tendré", english: "I will have", chinese: "我将会有", pos: "Verb", day: "Day 6", examples: ["En el futuro tendré más tiempo para viajar.", "Mañana tendré una clase."] },
+  { spanish: "saldré", english: "I will go out / leave", chinese: "我将会出去; 离开", pos: "Verb", day: "Day 6", examples: ["Mañana saldré temprano.", "Después del trabajo saldré con amigos."] },
+  { spanish: "vendré", english: "I will come", chinese: "我将会来", pos: "Verb", day: "Day 6", examples: ["Mañana vendré a casa temprano.", "Vendré después de la clase."] },
+  { spanish: "haré", english: "I will do / make", chinese: "我将会做", pos: "Verb", day: "Day 6", examples: ["Mañana haré la comida.", "En el futuro haré más práctica."] },
+  { spanish: "diré", english: "I will say / tell", chinese: "我将会说; 告诉", pos: "Verb", day: "Day 6", examples: ["Mañana diré la respuesta en español.", "Después diré más sobre mi viaje."] },
+  { spanish: "podré", english: "I will be able to", chinese: "我将能够", pos: "Verb", day: "Day 6", examples: ["Mañana podré estudiar más.", "Con práctica podré hablar mejor."] },
+  { spanish: "pondré", english: "I will put", chinese: "我将放", pos: "Verb", day: "Day 6", examples: ["Pondré el libro en la mesa.", "Después pondré la comida aquí."] },
+  { spanish: "querré", english: "I will want", chinese: "我将会想要", pos: "Verb", day: "Day 6", examples: ["En el futuro querré viajar más.", "Mañana querré descansar un poco."] },
+  { spanish: "sabré", english: "I will know", chinese: "我将会知道; 我将会懂", pos: "Verb", day: "Day 6", examples: ["Algún día sabré hablar español muy bien.", "Con más práctica sabré más palabras."] }
 ].map((item) => ({ ...item, id: `vocab-${slugify(item.spanish)}`, topic: inferTopic(item) }));
 
 const noteDays = [
@@ -341,6 +636,24 @@ const noteDays = [
       "Ayer fui a la escuela.",
       "Ayer tuve trabajo.",
       "Ayer cociné la comida."
+    ]
+  },
+  {
+    title: "Day 6 Notes",
+    focus: "Jugar, viajar, and future forms",
+    points: [
+      "Practiced `jugar` and `viajar` in past, present, near future, and simple future.",
+      "Used the near future structure `voy a + infinitive` with examples such as `voy a jugar` and `voy a viajar`.",
+      "Learned regular simple future forms such as `jugaré` and `viajaré`.",
+      "Added important irregular future forms such as `iré`, `tendré`, `saldré`, `vendré`, `haré`, `diré`, `podré`, `pondré`, `querré`, and `sabré`.",
+      "Connected time markers such as `mañana`, `el fin de semana pasado`, and `en el futuro` with the right tense."
+    ],
+    examples: [
+      "Ayer jugué con mi familia.",
+      "Hoy viajo a China y voy a viajar a México.",
+      "Mañana voy a jugar con mis amigos.",
+      "En el futuro viajaré a muchos países.",
+      "Algún día sabré hablar español muy bien."
     ]
   }
 ];
@@ -426,6 +739,33 @@ const stories = [
         art: storySceneCookingRice()
       }
     ]
+  },
+  {
+    title: "Un viaje y un plan",
+    level: "50-100 words",
+    spanish: "El fin de semana pasado viajé a Japón con mis amigos por trabajo. Hoy viajo a China, pero mañana voy a viajar a México. Ayer jugué con mi familia y cuando era niño jugué mucho con mis amigos. En el futuro jugaré más con mi familia y viajaré a muchos países. Algún día sabré hablar español muy bien y diré más cosas sobre mis viajes.",
+    english: "Last weekend I traveled to Japan with my friends for work. Today I travel to China, but tomorrow I am going to travel to Mexico. Yesterday I played with my family, and when I was a child I played a lot with my friends. In the future I will play more with my family and I will travel to many countries. Someday I will know how to speak Spanish very well and I will say more things about my trips.",
+    focus: ["viajé", "viajo", "voy a viajar", "jugué", "jugaré", "viajaré", "sabré"],
+    scenes: [
+      {
+        title: "Travel Plan",
+        spanishCaption: "El fin de semana pasado viajé a Japón y mañana voy a viajar a México.",
+        englishCaption: "Last weekend I traveled to Japan and tomorrow I am going to travel to Mexico.",
+        art: storySceneSchoolDay()
+      },
+      {
+        title: "Play Time",
+        spanishCaption: "Ayer jugué con mi familia y cuando era niño jugué mucho con mis amigos.",
+        englishCaption: "Yesterday I played with my family, and when I was a child I played a lot with my friends.",
+        art: storySceneFamilyTalk()
+      },
+      {
+        title: "Future Spanish",
+        spanishCaption: "Algún día sabré hablar español muy bien y viajaré a muchos países.",
+        englishCaption: "Someday I will know how to speak Spanish very well and I will travel to many countries.",
+        art: storySceneWritingStory()
+      }
+    ]
   }
 ];
 
@@ -489,6 +829,30 @@ const quizQuestions = [
     options: ["Mi hermana se llama Jade.", "Mi hermana llama Jade.", "Mi se llama hermana Jade."],
     answer: "Mi hermana se llama Jade.",
     explanation: "Use se llama for naming another person: Mi hermana se llama Jade. The other choices break the sentence structure."
+  },
+  {
+    prompt: "What does `voy a viajar` mean?",
+    options: ["I traveled", "I am going to travel", "I will know"],
+    answer: "I am going to travel",
+    explanation: "`Voy a + infinitive` is the near future pattern, so `voy a viajar` means `I am going to travel`."
+  },
+  {
+    prompt: "Which is the correct simple future form of `jugar` for yo?",
+    options: ["jugaré", "jugué", "juego"],
+    answer: "jugaré",
+    explanation: "`Jugaré` is the yo simple future form. `Jugué` is past, and `juego` is present."
+  },
+  {
+    prompt: "Which sentence uses the near future correctly?",
+    options: ["Mañana voy jugar con mis amigos.", "Mañana voy a jugar con mis amigos.", "Mañana jugar con mis amigos voy."],
+    answer: "Mañana voy a jugar con mis amigos.",
+    explanation: "The structure is `voy a + infinitive`, so you need the `a`: `voy a jugar`."
+  },
+  {
+    prompt: "What is the correct future form of `saber` for yo?",
+    options: ["sabré", "sé", "supe"],
+    answer: "sabré",
+    explanation: "`Sabré` is the irregular future form of `saber`. `Sé` is present, and `supe` is past."
   }
 ];
 
@@ -504,6 +868,92 @@ let speechVoices = [];
 let speakingTimeout;
 let studySelections = loadStudySelections();
 let currentLanguage = window.localStorage.getItem(STORAGE_KEYS.language) || "en";
+let reviewMeaningMode = window.localStorage.getItem(STORAGE_KEYS.reviewMeaningMode) || "english";
+
+const vocabularyExampleTranslations = {
+  "Quiero aprender español.": "I want to learn Spanish.",
+  "Yo hablo español.": "I speak Spanish.",
+  "Ellos comen pizza.": "They eat pizza.",
+  "Yo vivo en Florida.": "I live in Florida.",
+  "Nosotros estudiamos español.": "We study Spanish.",
+  "Yo trabajo en casa.": "I work at home.",
+  "Yo cocino en casa.": "I cook at home.",
+  "Ella limpia.": "She cleans.",
+  "Yo vivo en casa.": "I live at home.",
+  "Nosotros estudiamos en la escuela.": "We study at school.",
+  "Ellos comen la comida.": "They eat the food.",
+  "Yo soy de Florida.": "I am from Florida.",
+  "Yo estoy en casa.": "I am at home.",
+  "Yo soy un estudiante de español.": "I am a Spanish student.",
+  "Hoy estoy cansado.": "Today I am tired.",
+  "Hoy estoy ocupado.": "Today I am busy.",
+  "Hoy estoy contento.": "Today I am happy.",
+  "Yo voy a casa.": "I go home.",
+  "Yo tengo trabajo.": "I have work.",
+  "Yo hago la comida en casa.": "I make the food at home.",
+  "Yo quiero pizza.": "I want pizza.",
+  "Hoy estoy tranquilo.": "Today I am calm.",
+  "Hoy estoy nervioso.": "Today I am nervous.",
+  "Hoy estoy orgulloso.": "Today I am proud.",
+  "¿Qué quieres comer hoy?": "What do you want to eat today?",
+  "¿Dónde vas hoy?": "Where are you going today?",
+  "¿Cuándo vas a la escuela?": "When are you going to school?",
+  "¿Cómo estás hoy?": "How are you today?",
+  "¿Quién es tu profesor?": "Who is your teacher?",
+  "Me llamo Wen.": "My name is Wen.",
+  "Mi madre se llama Laura.": "My mother's name is Laura.",
+  "Mi padre se llama Paul.": "My father's name is Paul.",
+  "Mi hermano se llama Wen.": "My brother's name is Wen.",
+  "Mi hermana se llama Jade.": "My sister's name is Jade.",
+  "Tengo dos hermanos.": "I have two siblings.",
+  "Mi familia vive en China.": "My family lives in China.",
+  "Ayer fui a la escuela.": "Yesterday I went to school.",
+  "Ayer tuve trabajo.": "Yesterday I had work.",
+  "Ayer hice la comida en casa.": "Yesterday I made the food at home.",
+  "Ayer quise pizza.": "Yesterday I wanted pizza.",
+  "Ayer estudié español en casa.": "Yesterday I studied Spanish at home.",
+  "Ayer trabajé.": "Yesterday I worked.",
+  "Ayer cociné la comida.": "Yesterday I cooked the food.",
+  "Ayer hablé español.": "Yesterday I spoke Spanish.",
+  "Estoy contento porque estudio español.": "I am happy because I study Spanish.",
+  "Quise pizza, pero hice arroz.": "I wanted pizza, but I made rice.",
+  "Después estudié un poco más.": "Afterward I studied a little more.",
+  "También hablé con mi familia.": "I also spoke with my family.",
+  "Hice arroz en casa.": "I made rice at home.",
+  "Quiero estudiar más.": "I want to study more.",
+  "Es una historia corta.": "It is a short story.",
+  "Escribo una historia sobre mi familia.": "I write a story about my family.",
+  "Mañana voy a jugar con mis amigos.": "Tomorrow I am going to play with my friends.",
+  "Hoy juego en casa.": "Today I play at home.",
+  "Ayer jugué con mi familia.": "Yesterday I played with my family.",
+  "En el futuro jugaré más con mi familia.": "In the future I will play more with my family.",
+  "Voy a viajar a México.": "I am going to travel to Mexico.",
+  "Hoy viajo a China.": "Today I travel to China.",
+  "El fin de semana pasado viajé a Japón con mis amigos por trabajo.": "Last weekend I traveled to Japan with my friends for work.",
+  "En el futuro viajaré a muchos países.": "In the future I will travel to many countries.",
+  "Hoy voy a jugar un poco en casa.": "Today I am going to play a little at home.",
+  "Mañana voy a viajar a México.": "Tomorrow I am going to travel to Mexico.",
+  "Mañana viajaré temprano.": "Tomorrow I will travel early.",
+  "Anoche estudié español en casa.": "Last night I studied Spanish at home.",
+  "Voy a practicar otra vez.": "I am going to practice again.",
+  "El fin de semana pasado viajé a Japón.": "Last weekend I traveled to Japan.",
+  "El próximo año voy a viajar más.": "Next year I am going to travel more.",
+  "Voy al parque con mi familia.": "I go to the park with my family.",
+  "Me gusta jugar fútbol.": "I like to play soccer.",
+  "Viajé a Japón por trabajo.": "I traveled to Japan for work.",
+  "Viajaré a muchos países.": "I will travel to many countries.",
+  "Algún día sabré hablar español muy bien.": "Someday I will know how to speak Spanish very well.",
+  "Mañana iré al trabajo en tren.": "Tomorrow I will go to work by train.",
+  "En el futuro tendré más tiempo para viajar.": "In the future I will have more time to travel.",
+  "Mañana saldré temprano.": "Tomorrow I will leave early.",
+  "Mañana vendré a casa temprano.": "Tomorrow I will come home early.",
+  "Mañana haré la comida.": "Tomorrow I will make the food.",
+  "Mañana diré la respuesta en español.": "Tomorrow I will say the answer in Spanish.",
+  "Mañana podré estudiar más.": "Tomorrow I will be able to study more.",
+  "Pondré el libro en la mesa.": "I will put the book on the table.",
+  "En el futuro querré viajar más.": "In the future I will want to travel more.",
+  "Con más práctica sabré más palabras.": "With more practice I will know more words."
+};
 
 const essayPrompts = [
   {
@@ -529,6 +979,12 @@ const essayPrompts = [
     hints: ["Use: ayer", "Try one of: fui, hice, trabajé, estudié, cociné", "End with: estuve or estaba is optional, but simple present review is also fine if needed"],
     sample: "Ayer fui a la escuela. Ayer estudié español y cociné la comida. Después, estuve cansado pero contento.",
     explanation: "This practices Day 5 past tense forms with a simple time marker."
+  },
+  {
+    prompt: "Write 3 to 4 short Spanish sentences about your future plans: say one thing you are going to do, one place you are going to travel, and one thing you will do or know in the future.",
+    hints: ["Use: voy a ...", "Try: jugar, viajar", "Add one future form: jugaré, viajaré, iré, tendré, haré, sabré"],
+    sample: "Mañana voy a jugar con mi familia. El próximo año voy a viajar a México. En el futuro viajaré a muchos países y algún día sabré hablar español muy bien.",
+    explanation: "This practices Day 6 near future and simple future forms."
   }
 ];
 
@@ -691,6 +1147,7 @@ function applyLanguage() {
     "index.html": t("Spanish Learning", "西班牙语学习"),
     "vocabulary.html": t("Spanish Learning - Vocabulary", "西班牙语学习 - 词汇"),
     "grammar.html": t("Spanish Learning - Grammar", "西班牙语学习 - 语法"),
+    "verbs.html": t("Spanish Learning - Verb Tables", "西班牙语学习 - 动词变位表"),
     "pronunciation.html": t("Spanish Learning - Pronunciation", "西班牙语学习 - 发音"),
     "review.html": t("Spanish Learning - Review", "西班牙语学习 - 复习"),
     "flashcards.html": t("Spanish Learning - Flashcards", "西班牙语学习 - 抽认卡"),
@@ -712,11 +1169,15 @@ function applyLanguage() {
     ],
     "vocabulary.html": [
       ["h2", t("Vocabulary", "词汇")],
-      [".section-header .muted", t("Core words and example phrases pulled from the first five study days.", "整理自前五天学习内容的核心词汇和例句。")]
+      [".section-header .muted", t("Core words and example phrases pulled from the first six study days.", "整理自前六天学习内容的核心词汇和例句。")]
     ],
     "grammar.html": [
       ["h2", t("Grammar", "语法")],
       [".section-header .muted", t("Short explanations and reference tables for the main grammar points used in your lessons.", "课程主要语法点的简短说明和参考表。")]
+    ],
+    "verbs.html": [
+      ["h2", t("Verb Tables", "动词变位表")],
+      [".section-header .muted", t("Compare present, simple past, present perfect, and future forms for regular verbs and common irregular verbs.", "对比规则动词和常用不规则动词的现在时、简单过去时、现在完成时和将来时。")]
     ],
     "pronunciation.html": [
       ["h2", t("Pronunciation", "发音")],
@@ -742,7 +1203,7 @@ function applyLanguage() {
     ],
     "writing.html": [
       ["h2", t("Writing", "写作")],
-      [".section-header .muted", t("Practice short paragraphs for self-introduction, daily routine, and family topics.", "练习自我介绍、日常生活和家庭主题的短文。")],
+      [".section-header .muted", t("Practice short paragraphs for self-introduction, daily routine, family, and future-plan topics.", "练习自我介绍、日常生活、家庭和未来计划主题的短文。")],
       ["#next-essay", t("Next Prompt", "下一个题目")],
       ["#show-essay-answer", t("Show Model Answer", "显示范文")],
       ["#check-writing", t("Check Writing", "检查写作")]
@@ -778,8 +1239,8 @@ function applyLanguage() {
     const introParagraphs = document.querySelectorAll(".card > p");
     if (introParagraphs[0]) {
       introParagraphs[0].textContent = t(
-        "This website is a personal Spanish study dashboard based on your first five days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
-        "这个网站是根据你前五天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
+        "This website is a personal Spanish study dashboard based on your first six days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
+        "这个网站是根据你前六天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
       );
     }
     if (introParagraphs[1]) {
@@ -945,6 +1406,19 @@ function getFilteredVocabulary() {
   }).sort((a, b) => a.spanish.localeCompare(b.spanish, "es", { sensitivity: "base" }));
 }
 
+function getVocabularyExampleTranslation(example) {
+  return vocabularyExampleTranslations[example] || "";
+}
+
+function getReviewMeaningLabel(item) {
+  return reviewMeaningMode === "chinese" ? item.chinese : item.english;
+}
+
+function saveReviewMeaningMode(mode) {
+  reviewMeaningMode = mode;
+  window.localStorage.setItem(STORAGE_KEYS.reviewMeaningMode, mode);
+}
+
 function renderTopicFilters() {
   if (!topicFilters) {
     return;
@@ -974,9 +1448,9 @@ function renderVocabulary(items) {
           <tr>
             <th scope="col">Pick</th>
             <th scope="col">${t("Spanish", "西班牙语")}</th>
-            <th scope="col">${t("English", "英语")}</th>
-            <th scope="col">${t("Chinese", "中文")}</th>
+            <th scope="col">${t("Meaning", "含义")}</th>
             <th scope="col">${t("Examples", "例句")}</th>
+            <th scope="col">${t("Chinese", "中文")}</th>
           </tr>
         </thead>
         <tbody>
@@ -992,12 +1466,14 @@ function renderVocabulary(items) {
                 </button>
               </td>
               <td>${item.english}</td>
-              <td>${item.chinese}</td>
               <td>
                 <ul class="table-example-list">
                   ${item.examples.slice(0, 1).map((example) => `
                     <li class="example-row">
-                      <span>${example}</span>
+                      <span>
+                        <strong>${example}</strong><br>
+                        <span class="example-translation">${getVocabularyExampleTranslation(example)}</span>
+                      </span>
                       <button class="audio-icon-button audio-inline-button" type="button" data-speak="${example}" aria-label="Play pronunciation for ${example}">
                         <span aria-hidden="true">🔊</span>
                       </button>
@@ -1005,6 +1481,7 @@ function renderVocabulary(items) {
                   `).join("")}
                 </ul>
               </td>
+              <td>${item.chinese}</td>
             </tr>
           `).join("")}
         </tbody>
@@ -1041,7 +1518,7 @@ function renderGrammar() {
           <section class="grammar-list-block">
             <p class="grammar-subtitle">${t("Examples", "例子")}</p>
             <ul class="note-list">
-              ${point.examples.map((example) => `<li>${example}</li>`).join("")}
+              ${point.examples.map((example) => `<li><strong>${example.spanish}</strong><br><span class="example-translation">${example.english}</span></li>`).join("")}
             </ul>
           </section>
         </div>
@@ -1062,6 +1539,50 @@ function renderGrammar() {
             </div>
           </section>
         ` : ""}
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderVerbTables() {
+  if (!verbTables) {
+    return;
+  }
+
+  const headers = [t("Subject", "主语"), t("Present", "现在时"), t("Simple Past", "简单过去时"), t("Present Perfect", "现在完成时"), t("Future", "将来时")];
+
+  verbTables.innerHTML = verbTableSections.map((section) => `
+    <article class="verb-section-card">
+      <div class="section-header">
+        <div>
+          <h3>${section.title}</h3>
+          <p class="muted">${section.description}</p>
+        </div>
+      </div>
+      <div class="verb-table-stack">
+        ${section.tables.map((table) => `
+          <section class="grammar-list-block verb-table-card">
+            <div class="verb-table-header">
+              <div>
+                <h3>${table.verb}</h3>
+                <p class="muted">${table.english}</p>
+              </div>
+              <p class="verb-table-note">${table.note}</p>
+            </div>
+            <div class="grammar-table-wrap">
+              <table class="grammar-table verb-table">
+                <thead>
+                  <tr>${headers.map((header) => `<th scope="col">${header}</th>`).join("")}</tr>
+                </thead>
+                <tbody>
+                  ${table.rows.map((row) => `
+                    <tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${cell}</th>` : `<td>${cell}</td>`).join("")}</tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        `).join("")}
       </div>
     </article>
   `).join("");
@@ -1140,14 +1661,22 @@ function renderReview() {
   reviewContent.innerHTML = `
     ${selectedVocabulary.length ? `
       <article class="card">
-        <h2>${t("Vocabulary Review", "词汇复习")}</h2>
+        <div class="section-header">
+          <div>
+            <h2>${t("Vocabulary Review", "词汇复习")}</h2>
+          </div>
+          <div class="review-toggle-group" role="group" aria-label="Review meaning language">
+            <button class="filter-chip ${reviewMeaningMode === "english" ? "active" : ""}" type="button" data-review-meaning="english">${t("English", "英语")}</button>
+            <button class="filter-chip ${reviewMeaningMode === "chinese" ? "active" : ""}" type="button" data-review-meaning="chinese">${t("Chinese", "中文")}</button>
+          </div>
+        </div>
         <div class="review-grid">
           ${selectedVocabulary.map((item) => `
             <section class="review-card">
               <h3>${item.spanish}</h3>
-              <p><strong>${t("English", "英语")}:</strong> ${item.english}</p>
-              <p><strong>${t("Chinese", "中文")}:</strong> ${item.chinese}</p>
-              <p><strong>${t("Why it matters", "为什么重要")}:</strong> ${item.examples[0]}</p>
+              <p><strong>${reviewMeaningMode === "chinese" ? t("Chinese", "中文") : t("Meaning", "含义")}:</strong> ${getReviewMeaningLabel(item)}</p>
+              <p><strong>${t("Example", "例句")}:</strong> ${item.examples[0]}</p>
+              <p><strong>${t("Example translation", "例句翻译")}:</strong> ${getVocabularyExampleTranslation(item.examples[0])}</p>
             </section>
           `).join("")}
         </div>
@@ -1886,6 +2415,17 @@ if (flashcardList) {
   });
 }
 
+if (reviewContent) {
+  reviewContent.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-review-meaning]");
+    if (!button) {
+      return;
+    }
+    saveReviewMeaningMode(button.dataset.reviewMeaning);
+    renderReview();
+  });
+}
+
 if (checkQuizButton) {
   checkQuizButton.addEventListener("click", checkQuiz);
 }
@@ -1950,6 +2490,7 @@ renderTopicFilters();
 renderRandomBanner();
 renderVocabulary(getFilteredVocabulary());
 renderGrammar();
+renderVerbTables();
 setRecordingTarget(currentRecordingTarget);
 renderPronunciation();
 renderFlashcards(getFilteredVocabulary());

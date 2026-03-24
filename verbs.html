@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spanish Learning - Daily Notes</title>
+  <title>Spanish Learning - Verb Tables</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
       <a class="tab-button" href="index.html">Read Me</a>
       <a class="tab-button" href="vocabulary.html">Vocabulary</a>
       <a class="tab-button" href="grammar.html">Grammar</a>
-      <a class="tab-button" href="verbs.html">Verb Tables</a>
+      <a class="tab-button active" href="verbs.html">Verb Tables</a>
       <a class="tab-button" href="pronunciation.html">Pronunciation</a>
       <a class="tab-button" href="review.html">Review</a>
       <a class="tab-button" href="flashcards.html">Flashcards</a>
@@ -24,13 +24,18 @@
       <a class="tab-button" href="practice.html">Practice</a>
       <a class="tab-button" href="writing.html">Writing</a>
       <a class="tab-button" href="summary.html">Summary</a>
-      <a class="tab-button active" href="notes.html">Daily Notes</a>
+      <a class="tab-button" href="notes.html">Daily Notes</a>
     </nav>
 
     <section class="tab-panel active">
       <article class="card">
-        <h2>Daily Notes</h2>
-        <div id="notes-list" class="notes-list"></div>
+        <div class="section-header">
+          <div>
+            <h2>Verb Tables</h2>
+            <p class="muted">Compare present, simple past, present perfect, and future forms for regular verbs and common irregular verbs.</p>
+          </div>
+        </div>
+        <div id="verb-tables" class="grammar-grid"></div>
       </article>
     </section>
   </main>
