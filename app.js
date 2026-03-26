@@ -278,12 +278,12 @@ const grammarPoints = [
     details: [
       "These verbs still use the normal future endings, but the stem changes first: `tener -> tendr-`, `hacer -> har-`, `decir -> dir-`.",
       "They are high-frequency verbs, so learning them early makes future plans much easier to say.",
-      "A good beginner strategy is to memorize them in short model sentences."
+      "A good beginner strategy is to memorize them in short model sentences, especially `saldré` and `sabré`."
     ],
     examples: [
       { spanish: "Mañana iré al trabajo en tren.", english: "Tomorrow I will go to work by train." },
-      { spanish: "En el futuro tendré más tiempo para viajar.", english: "In the future I will have more time to travel." },
-      { spanish: "Algún día sabré hablar español muy bien.", english: "Someday I will know how to speak Spanish very well." }
+      { spanish: "Mañana saldré de la oficina temprano.", english: "Tomorrow I will leave the office early." },
+      { spanish: "Mañana sabré la respuesta.", english: "Tomorrow I will know the answer." }
     ],
     table: {
       headers: ["Infinitive", "Yo Future", "Stem Change"],
@@ -553,14 +553,14 @@ const vocabulary = [
   { spanish: "algún día", english: "someday", chinese: "有一天", pos: "Phrase", day: "Day 6", examples: ["Algún día sabré hablar español muy bien.", "Algún día viajaré a España."] },
   { spanish: "iré", english: "I will go", chinese: "我将会去", pos: "Verb", day: "Day 6", examples: ["Mañana iré al trabajo en tren.", "Algún día iré a España."] },
   { spanish: "tendré", english: "I will have", chinese: "我将会有", pos: "Verb", day: "Day 6", examples: ["En el futuro tendré más tiempo para viajar.", "Mañana tendré una clase."] },
-  { spanish: "saldré", english: "I will go out / leave", chinese: "我将会出去; 离开", pos: "Verb", day: "Day 6", examples: ["Mañana saldré temprano.", "Después del trabajo saldré con amigos."] },
+  { spanish: "saldré", english: "I will go out / leave", chinese: "我将会出去; 离开", pos: "Verb", day: "Day 6", examples: ["Mañana saldré de la oficina temprano.", "El próximo mes saldré de vacaciones."] },
   { spanish: "vendré", english: "I will come", chinese: "我将会来", pos: "Verb", day: "Day 6", examples: ["Mañana vendré a casa temprano.", "Vendré después de la clase."] },
   { spanish: "haré", english: "I will do / make", chinese: "我将会做", pos: "Verb", day: "Day 6", examples: ["Mañana haré la comida.", "En el futuro haré más práctica."] },
   { spanish: "diré", english: "I will say / tell", chinese: "我将会说; 告诉", pos: "Verb", day: "Day 6", examples: ["Mañana diré la respuesta en español.", "Después diré más sobre mi viaje."] },
   { spanish: "podré", english: "I will be able to", chinese: "我将能够", pos: "Verb", day: "Day 6", examples: ["Mañana podré estudiar más.", "Con práctica podré hablar mejor."] },
   { spanish: "pondré", english: "I will put", chinese: "我将放", pos: "Verb", day: "Day 6", examples: ["Pondré el libro en la mesa.", "Después pondré la comida aquí."] },
   { spanish: "querré", english: "I will want", chinese: "我将会想要", pos: "Verb", day: "Day 6", examples: ["En el futuro querré viajar más.", "Mañana querré descansar un poco."] },
-  { spanish: "sabré", english: "I will know", chinese: "我将会知道; 我将会懂", pos: "Verb", day: "Day 6", examples: ["Algún día sabré hablar español muy bien.", "Con más práctica sabré más palabras."] }
+  { spanish: "sabré", english: "I will know", chinese: "我将会知道; 我将会懂", pos: "Verb", day: "Day 6", examples: ["Mañana sabré la respuesta.", "En el futuro sabré hablar español muy bien."] }
 ].map((item) => ({ ...item, id: `vocab-${slugify(item.spanish)}`, topic: inferTopic(item) }));
 
 const noteDays = [
@@ -646,14 +646,40 @@ const noteDays = [
       "Used the near future structure `voy a + infinitive` with examples such as `voy a jugar` and `voy a viajar`.",
       "Learned regular simple future forms such as `jugaré` and `viajaré`.",
       "Added important irregular future forms such as `iré`, `tendré`, `saldré`, `vendré`, `haré`, `diré`, `podré`, `pondré`, `querré`, and `sabré`.",
+      "Added extra Day 6 practice for `salir -> saldré` and `saber -> sabré` with short future sentences.",
       "Connected time markers such as `mañana`, `el fin de semana pasado`, and `en el futuro` with the right tense."
     ],
     examples: [
       "Ayer jugué con mi familia.",
       "Hoy viajo a China y voy a viajar a México.",
       "Mañana voy a jugar con mis amigos.",
+      "Mañana saldré de la oficina temprano.",
+      "Mañana sabré la respuesta.",
       "En el futuro viajaré a muchos países.",
-      "Algún día sabré hablar español muy bien."
+      "En el futuro sabré hablar español muy bien."
+    ]
+  },
+  {
+    title: "Day 7 Note",
+    focus: "Simple future in yo form and voy a review",
+    points: [
+      "Reviewed the basic yo future rule for regular verbs: infinitive + `-é`, such as `jugaré`, `viajaré`, `estudiaré`, and `trabajaré`.",
+      "Practiced simple future sentences with time markers such as `mañana`, `el próximo mes`, and `en el futuro`.",
+      "Used the verbs `estudiaré`, `viajaré`, `saldré`, and `sabré` in short personal sentences.",
+      "Practiced the sentence model `time + future verb + detail` to build new lines more easily.",
+      "Reviewed `voy a + infinitive` as the near future pattern and compared it with the simple future."
+    ],
+    examples: [
+      "Mañana estudiaré español por la noche.",
+      "En el futuro viajaré a Japón otra vez.",
+      "El próximo mes saldré más con mis amigos.",
+      "En el futuro sabré español muy bien.",
+      "Hoy estudiaré español por una hora por la noche.",
+      "Mañana estudiaré español por una hora.",
+      "El próximo año viajaré a muchos países.",
+      "El sábado jugaré con mi familia.",
+      "Mañana voy a estudiar español.",
+      "Este fin de semana voy a viajar con mi familia."
     ]
   }
 ];
@@ -946,13 +972,17 @@ const vocabularyExampleTranslations = {
   "Mañana iré al trabajo en tren.": "Tomorrow I will go to work by train.",
   "En el futuro tendré más tiempo para viajar.": "In the future I will have more time to travel.",
   "Mañana saldré temprano.": "Tomorrow I will leave early.",
+  "Mañana saldré de la oficina temprano.": "Tomorrow I will leave the office early.",
+  "El próximo mes saldré de vacaciones.": "Next month I will leave for vacation.",
   "Mañana vendré a casa temprano.": "Tomorrow I will come home early.",
   "Mañana haré la comida.": "Tomorrow I will make the food.",
   "Mañana diré la respuesta en español.": "Tomorrow I will say the answer in Spanish.",
   "Mañana podré estudiar más.": "Tomorrow I will be able to study more.",
   "Pondré el libro en la mesa.": "I will put the book on the table.",
   "En el futuro querré viajar más.": "In the future I will want to travel more.",
-  "Con más práctica sabré más palabras.": "With more practice I will know more words."
+  "Con más práctica sabré más palabras.": "With more practice I will know more words.",
+  "Mañana sabré la respuesta.": "Tomorrow I will know the answer.",
+  "En el futuro sabré hablar español muy bien.": "In the future I will know how to speak Spanish very well."
 };
 
 const essayPrompts = [
@@ -1239,8 +1269,8 @@ function applyLanguage() {
     const introParagraphs = document.querySelectorAll(".card > p");
     if (introParagraphs[0]) {
       introParagraphs[0].textContent = t(
-        "This website is a personal Spanish study dashboard based on your first six days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
-        "这个网站是根据你前六天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
+        "This website is a personal Spanish study dashboard based on your first seven days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
+        "这个网站是根据你前七天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
       );
     }
     if (introParagraphs[1]) {
