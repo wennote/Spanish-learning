@@ -207,6 +207,30 @@ const grammarPoints = [
     }
   },
   {
+    title: "Preterite vs Imperfect vs Present Perfect",
+    rule: "Use the preterite for finished past actions, the imperfect for ongoing or habitual past actions, and the present perfect for past actions that still connect to now.",
+    details: [
+      "Preterite answers `what happened and finished`: `Ayer trabajé.`",
+      "Imperfect gives background, repeated action, or `used to / was -ing`: `Trabajaba mucho.` and `Estudiaba cuando llamaste.`",
+      "Present perfect uses `haber + past participle` for a past action linked to the present: `He trabajado mucho hoy.`",
+      "A quick rule is: finished action -> preterite, repeated or ongoing past -> imperfect, connected to now -> present perfect.",
+      "Do not mix the auxiliary and the preterite form. Say `he trabajado`, not `he trabajé`."
+    ],
+    examples: [
+      { spanish: "Trabajé ayer.", english: "I worked yesterday." },
+      { spanish: "Trabajaba mucho.", english: "I used to work a lot." },
+      { spanish: "He trabajado mucho hoy.", english: "I have worked a lot today." }
+    ],
+    table: {
+      headers: ["English idea", "Spanish", "Tense"],
+      rows: [
+        ["I worked", "trabajé", "preterite"],
+        ["I was working / used to work", "trabajaba", "imperfect"],
+        ["I have worked", "he trabajado", "present perfect"]
+      ]
+    }
+  },
+  {
     title: "Connectors",
     rule: "Small linking words help combine ideas into longer sentences.",
     details: [
@@ -681,8 +705,37 @@ const noteDays = [
       "Mañana voy a estudiar español.",
       "Este fin de semana voy a viajar con mi familia."
     ]
+  },
+  {
+    title: "Day 8 Note",
+    focus: "Preterite, imperfect, and present perfect",
+    points: [
+      "Reviewed the three key past-tense ideas: preterite for completed actions, imperfect for ongoing or habitual past actions, and present perfect for past actions connected to now.",
+      "Compared regular preterite and imperfect endings for `trabajar`, `comer`, and `vivir`.",
+      "Reviewed high-frequency irregular preterite verbs such as `fui`, `tuve`, `hice`, `estuve`, `pude`, `dije`, and `vine`.",
+      "Explained `he trabajado` as `haber + past participle` and connected it to life experience, recent actions, and present results.",
+      "Used a quick decision rule: finished action -> preterite, ongoing or repeated past -> imperfect, connected to now -> present perfect.",
+      "Added trigger words such as `ayer`, `anoche`, `siempre`, `mientras`, `hoy`, `esta semana`, and `ya`.",
+      "Noted that in much of Latin America, the preterite often replaces the present perfect in daily speech.",
+      "Reviewed the common mistake `he trabajé` and corrected it to `he trabajado`."
+    ],
+    examples: [
+      "Trabajé ayer.",
+      "Comí.",
+      "Trabajaba mucho.",
+      "Estudiaba cuando llamaste.",
+      "He trabajado.",
+      "He terminado el informe.",
+      "He trabajado mucho hoy.",
+      "Trabajé hoy."
+    ]
   }
 ];
+
+function getDayNumber(label) {
+  const match = label.match(/Day\s+(\d+)/i);
+  return match ? Number(match[1]) : 0;
+}
 
 const stories = [
   {
@@ -1269,8 +1322,8 @@ function applyLanguage() {
     const introParagraphs = document.querySelectorAll(".card > p");
     if (introParagraphs[0]) {
       introParagraphs[0].textContent = t(
-        "This website is a personal Spanish study dashboard based on your first seven days of notes. It is designed to keep your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, short reading passages, pronunciation, and writing practice without searching through separate files. The site is now organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
-        "这个网站是根据你前七天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
+        "This website is a personal Spanish study dashboard based on your first eight days of notes. It keeps your early learning material in one place so you can review verbs, vocabulary, sentence patterns, question forms, tense contrasts, short reading passages, pronunciation, and writing practice without searching through separate files. The site is organized as multiple pages instead of a single long file, so each section is easier to review and edit.",
+        "这个网站是根据你前八天学习笔记整理出的个人西班牙语学习面板。它把早期学习内容集中在一起，方便你复习动词、词汇、句型、疑问句、时态对比、短文、发音和写作练习，不需要再翻找分散文件。现在网站已经拆分成多个页面，而不是单个长页面，因此每个部分都更容易查看和修改。"
       );
     }
     if (introParagraphs[1]) {
@@ -1937,7 +1990,8 @@ function renderNotes() {
   if (!notesList) {
     return;
   }
-  notesList.innerHTML = noteDays.map((day) => `
+  const orderedNotes = [...noteDays].sort((a, b) => getDayNumber(b.title) - getDayNumber(a.title));
+  notesList.innerHTML = orderedNotes.map((day) => `
     <article class="note-card">
       <h3>${day.title}</h3>
       <p><strong>Focus:</strong> ${day.focus}</p>
